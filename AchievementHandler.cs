@@ -1,14 +1,11 @@
 ﻿using UnityEngine;
-
+using UnityEngine.UI;
 namespace AchievementCore
 {
     public class AchievementHandler : MonoBehaviour
     {
-        // Use this for initialization
-        void Start()
-        {
-            
-        }
+        public GameObject OptionsMenu, ui;
+        private bool set = false;
         public void TriggerAchievement(string achievement_id, string achievement_name)
         {
             if (AchievementIDHolder.unlocked_achievements.Contains(achievement_id)) return;
@@ -30,11 +27,14 @@ namespace AchievementCore
                 return;
             }
         }
-
-        // Update is called once per frame
         void Update()
         {
-
+            if (MSCLoader.CurrentScene.Game.ToString() == "GAME"  && !set)
+            {
+                set = true;
+                ui.transform.localPosition = new Vector3(-334f, -205f, 0f);
+                ui.transform.Find("MENU_PARENT/Button/Text").GetComponent<Text>().alignment = TextAnchor.MiddleRight;
+            }
         }
     }
 }

@@ -2,49 +2,55 @@
 using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
+using UnityEngine.UI;
+
 namespace AchievementCore
 {
-    public class AchievementCore : Mod
+    public static class AchievementCoreStartup
     {
-        public override string ID => "AchievementCore"; //Your mod ID (unique)
-        public override string Name => "AchievementCore"; //You mod name
-        public override string Author => "komornik"; //Your Username
-        public override string Version => "1.0"; //Version
-        public override string Description => "Achievements system for My Summer Car mods!"; //Short description of your mod
-
-        public bool loaded = false;
-        public AssetBundle ab;
-        public static AchievementHandler AchievementHandler;
-        public GameObject canvas;
-        private GameObject ui;
-        public static object[] achievements;
+        private static bool started = false, saving = false;
+        private static GameObject canvas, ui;
+        private static AssetBundle ab;
+        private static AchievementHandler AchievementHandler;
+        private static object[] achievements;
         private static readonly string saveFile = Application.persistentDataPath + "\\Achievements.dat";
-        public void Mod_OnMenuLoad()
+        //static Mod.Setup Mod_OnSave() => Mod.Setup.OnSave;
+        
+        public static void SaveAchievements()
         {
-            /*
-            if (!loaded)
+            if (!saving)
             {
+                saving = true;
+                SaveBytes.save(saveFile, AchievementIDHolder.unlocked_achievements);
+                SaveBytes.save(saveFile, AchievementIDHolder.locked_achievements);
+            }
+        }
+        public static void Startup()
+        {
+            ui.transform.localPosition = new Vector3(-558f, -565f, 0f);
+            ui.transform.localScale = new Vector3(1.1f, 1.1f, 0.8f);
+            ui.transform.Find("MENU_PARENT/Button/Text").GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
+            if (!started)
+            {
+                started = true;
                 GameObject g = new GameObject("AchievementCore");
                 AchievementHandler = g.AddComponent<AchievementHandler>();
+                AchievementHandler.ui = ui;
                 canvas = ModUI.CreateCanvas("AchievementCoreCanvas", true);
                 ab = LoadAssets.LoadBundle("AchievementCore.Assets.achcore.unity3d");
                 ui = GameObject.Instantiate(ab.LoadAsset<GameObject>("AchievementCoreUI.prefab"));
-                ui.transform.SetParent(canvas.transform);
-                ui.transform.position = new Vector3(-334f, -205f, 0f);
+                ui.transform.SetParent(canvas.transform, false);
+                ui.transform.localPosition = new Vector3(-558f, -565f, 0f);
+                ui.transform.localPosition = new Vector3(-334f, -205f, 0f);
                 ui.transform.localScale = new Vector3(1.1f, 1.1f, 0.8f);
                 LoadAchievements();
                 GameObject.DontDestroyOnLoad(g);
                 GameObject.DontDestroyOnLoad(ui);
-                loaded = true;
+                ModConsole.Log("<color=yellow>Achievement Core loaded succesfully!</color>");
+                ab.Unload(false);
             }
-            ab.Unload(false);
-            */
         }
-        private void Mod_OnLoad()
-        {   
-
-        }
-        void LoadAchievements()
+        private static void LoadAchievements()
         {
             if (File.Exists(saveFile))
             {
@@ -64,10 +70,6 @@ namespace AchievementCore
                 AchievementIDHolder.locked_achievements = AchievementIDHolder.Achievement_IDs;
                 AchievementIDHolder.unlocked_achievements = new List<string>();
             }
-        }
-        private void Mod_OnSave()
-        {
-            //AchievementCoreStartup.SaveAchievements();
         }
     }
 }

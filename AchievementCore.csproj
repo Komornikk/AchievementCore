@@ -60,11 +60,16 @@
     <Compile Include="AchievementCore.cs" />
     <Compile Include="AchievementHandler.cs" />
     <Compile Include="AchievementIDHolder.cs" />
+    <Compile Include="AchievementCoreStartup.cs" />
     <Compile Include="SaveBytes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\achcore.unity3d" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "G:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods" /y</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetPath)" "G:\Program Files (x86)\Steam\steamapps\common\My Summer Car\Mods\References" /y</PostBuildEvent>
   </PropertyGroup>
 </Project>
