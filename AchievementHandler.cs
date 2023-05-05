@@ -4,15 +4,9 @@ namespace AchievementCore
 {
     public class AchievementHandler : MonoBehaviour
     {
-        public GameObject OptionsMenu, ui;
-        private GameObject menu_parent;
+        public static GameObject OptionsMenu, ui, menu_parent;
         private bool set = false;
-        void Start()
-        {
-            OptionsMenu = GameObject.Find("Systems").transform.Find("OptionsMenu").gameObject;
-            menu_parent = transform.GetChild(0).gameObject;
-        }
-        public void TriggerAchievement(string achievement_id, string achievement_name)
+        public void TriggerAchievement(string achievement_id, string achievement_name, string achievement_description)
         {
             if (AchievementIDHolder.unlocked_achievements.Contains(achievement_id)) return;
             if (AchievementIDHolder.Achievement_IDs.Count != 0)
@@ -24,7 +18,7 @@ namespace AchievementCore
                 }
                 AchievementIDHolder.unlocked_achievements.Add(achievement_id);
                 AchievementIDHolder.locked_achievements.Remove(achievement_id);
-                MSCLoader.ModConsole.Print("Achievement Get!\n" + achievement_name);
+                MSCLoader.ModConsole.Print("Achievement Get!\n" + achievement_name + "\n<color=green>" + achievement_description + "</color>");
                 return;
             }
             else
@@ -35,8 +29,15 @@ namespace AchievementCore
         }
         void Update()
         {
-            menu_parent.SetActive(OptionsMenu);
-            if (Application.loadedLevelName == "GAME"  && !set)
+            if (Application.loadedLevelName == "GAME")
+            {
+                if (OptionsMenu == null) OptionsMenu = GameObject.Find("Systems").transform.Find("OptionsMenu").gameObject;
+                menu_parent.SetActive(OptionsMenu.activeSelf);
+            }
+        }
+        void LateUpdate()
+        {
+            if (Application.loadedLevelName == "GAME" && !set)
             {
                 set = true;
                 ui.transform.localPosition = new Vector3(-334f, -205f, 0f);

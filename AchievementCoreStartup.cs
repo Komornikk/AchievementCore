@@ -14,7 +14,6 @@ namespace AchievementCore
         private static AchievementHandler AchievementHandler;
         private static object[] achievements;
         private static readonly string saveFile = Application.persistentDataPath + "\\Achievements.dat";
-        //static Mod.Setup Mod_OnSave() => Mod.Setup.OnSave;
         
         public static void SaveAchievements()
         {
@@ -37,6 +36,7 @@ namespace AchievementCore
                 ab = LoadAssets.LoadBundle("AchievementCore.Assets.achcore.unity3d");
                 ui = GameObject.Instantiate(ab.LoadAsset<GameObject>("AchievementCoreUI.prefab"));
                 ui.transform.SetParent(canvas.transform, false);
+                AchievementHandler.menu_parent = canvas.transform.GetChild(0).GetChild(0).gameObject;
                 ui.transform.localPosition = new Vector3(-521f, -564f, 0f);
                 ui.transform.localScale = new Vector3(1.1f, 1.1f, 0.8f);
                 ui.transform.Find("MENU_PARENT/Button/Text").GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
