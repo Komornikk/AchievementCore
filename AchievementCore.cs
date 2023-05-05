@@ -10,25 +10,34 @@ namespace AchievementCore
         public override string Name => "AchievementCore"; //You mod name
         public override string Author => "komornik"; //Your Username
         public override string Version => "1.0"; //Version
-        public override string Description => ""; //Short description of your mod
+        public override string Description => "Achievements system for My Summer Car mods!"; //Short description of your mod
 
         public override void ModSetup()
         {
             SetupFunction(Setup.OnLoad, Mod_OnLoad);
             SetupFunction(Setup.OnSave, Mod_OnSave);
+            SetupFunction(Setup.OnMenuLoad, Mod_OnMenuLoad);
         }
         public static AchievementHandler AchievementHandler;
-        private void Mod_OnLoad()
+        private GameObject canvas;
+        private GameObject ui;
+        public static object[] achievements;
+        private static readonly string saveFile = Application.persistentDataPath + "\\Achievements.dat";
+        private void Mod_OnMenuLoad()
         {
             GameObject g = new GameObject("AchievementCore");
             AchievementHandler = g.AddComponent<AchievementHandler>();
-            GameObject testOBJ = new GameObject("testCube").AddComponent<BoxCollider>().gameObject;
-            testOBJ.GetComponent<BoxCollider>().isTrigger = true;
-            testOBJ.AddComponent<TestObject>();
-            AchievementIDHolder.Achievement_IDs.Add("test_id");
+            canvas = ModUI.CreateCanvas("AchievementCoreCanvas", false);
+            AssetBundle ab = LoadAssets.LoadBundle("AchievementCore.Assets.achcore.unity3d");
+            ui = GameObject.Instantiate(ab.LoadAsset<GameObject>("AchievementCoreUI.prefab"));
+            LoadAchievements();
+            GameObject.DontDestroyOnLoad(g);
+            GameObject.DontDestroyOnLoad(ui);
         }
-        public static object[] achievements;
-        private static readonly string saveFile = Application.persistentDataPath + "\\Achievements.dat";
+        private void Mod_OnLoad()
+        {   
+
+        }
         void LoadAchievements()
         {
             if (File.Exists(saveFile))

@@ -61,7 +61,6 @@
     <Compile Include="AchievementHandler.cs" />
     <Compile Include="AchievementIDHolder.cs" />
     <Compile Include="SaveBytes.cs" />
-    <Compile Include="TestObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
