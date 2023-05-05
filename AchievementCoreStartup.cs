@@ -27,27 +27,32 @@ namespace AchievementCore
         }
         public static void Startup()
         {
-            ui.transform.localPosition = new Vector3(-558f, -565f, 0f);
-            ui.transform.localScale = new Vector3(1.1f, 1.1f, 0.8f);
-            ui.transform.Find("MENU_PARENT/Button/Text").GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
             if (!started)
             {
                 started = true;
                 GameObject g = new GameObject("AchievementCore");
                 AchievementHandler = g.AddComponent<AchievementHandler>();
-                AchievementHandler.ui = ui;
+                AchievementIDHolder.AchievementHandler = AchievementHandler;
                 canvas = ModUI.CreateCanvas("AchievementCoreCanvas", true);
                 ab = LoadAssets.LoadBundle("AchievementCore.Assets.achcore.unity3d");
                 ui = GameObject.Instantiate(ab.LoadAsset<GameObject>("AchievementCoreUI.prefab"));
                 ui.transform.SetParent(canvas.transform, false);
-                ui.transform.localPosition = new Vector3(-558f, -565f, 0f);
-                ui.transform.localPosition = new Vector3(-334f, -205f, 0f);
+                ui.transform.localPosition = new Vector3(-521f, -564f, 0f);
                 ui.transform.localScale = new Vector3(1.1f, 1.1f, 0.8f);
+                ui.transform.Find("MENU_PARENT/Button/Text").GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
+                AchievementHandler.ui = ui;
                 LoadAchievements();
                 GameObject.DontDestroyOnLoad(g);
                 GameObject.DontDestroyOnLoad(ui);
                 ModConsole.Log("<color=yellow>Achievement Core loaded succesfully!</color>");
                 ab.Unload(false);
+            }
+            else
+            {
+                ui.transform.localPosition = new Vector3(-521f, -564f, 0f);
+                ui.transform.localScale = new Vector3(1.1f, 1.1f, 0.8f);
+                ui.transform.Find("MENU_PARENT/Button/Text").GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
+                started = false;
             }
         }
         private static void LoadAchievements()

@@ -5,7 +5,13 @@ namespace AchievementCore
     public class AchievementHandler : MonoBehaviour
     {
         public GameObject OptionsMenu, ui;
+        private GameObject menu_parent;
         private bool set = false;
+        void Start()
+        {
+            OptionsMenu = GameObject.Find("Systems").transform.Find("OptionsMenu").gameObject;
+            menu_parent = transform.GetChild(0).gameObject;
+        }
         public void TriggerAchievement(string achievement_id, string achievement_name)
         {
             if (AchievementIDHolder.unlocked_achievements.Contains(achievement_id)) return;
@@ -29,7 +35,8 @@ namespace AchievementCore
         }
         void Update()
         {
-            if (MSCLoader.CurrentScene.Game.ToString() == "GAME"  && !set)
+            menu_parent.SetActive(OptionsMenu);
+            if (Application.loadedLevelName == "GAME"  && !set)
             {
                 set = true;
                 ui.transform.localPosition = new Vector3(-334f, -205f, 0f);
