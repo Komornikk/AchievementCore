@@ -8,10 +8,11 @@ namespace AchievementCore
 {
     public static class AchievementCoreStartup
     {
-        private static bool started = false, saving = false;
-        private static GameObject canvas, ui;
+        private static bool started = false, saving = false, onload = false;
+        private static GameObject canvas, ui, achbox;
         private static AssetBundle ab;
         private static AchievementHandler AchievementHandler;
+        static Sprite default_icon;
         private static object[] achievements;
         private static readonly string saveFile = Application.persistentDataPath + "\\Achievements.dat";
         
@@ -24,34 +25,52 @@ namespace AchievementCore
                 SaveBytes.save(saveFile, AchievementIDHolder.locked_achievements);
             }
         }
+        public static void OnLoad()
+        {
+            if (!onload)
+            {
+                onload = true;
+                
+            }
+        }
         public static void Startup()
         {
             if (!started)
             {
                 started = true;
+                onload = false;
                 GameObject g = new GameObject("AchievementCore");
                 AchievementHandler = g.AddComponent<AchievementHandler>();
                 AchievementIDHolder.AchievementHandler = AchievementHandler;
-                canvas = ModUI.CreateCanvas("AchievementCoreCanvas", true);
+                canvas = ModUI.CreateCanvas("AchievementCoreUI", true);
                 ab = LoadAssets.LoadBundle("AchievementCore.Assets.achcore.unity3d");
-                ui = GameObject.Instantiate(ab.LoadAsset<GameObject>("AchievementCoreUI.prefab"));
-                ui.transform.SetParent(canvas.transform, false);
-                AchievementHandler.menu_parent = canvas.transform.GetChild(0).GetChild(0).gameObject;
-                ui.transform.localPosition = new Vector3(-521f, -564f, 0f);
-                ui.transform.localScale = new Vector3(1.1f, 1.1f, 0.8f);
-                ui.transform.Find("MENU_PARENT/Button/Text").GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
-                AchievementHandler.ui = ui;
+                achbox = GameObject.Instantiate(ab.LoadAsset<GameObject>("achbox.prefab"));
+                achbox.transform.SetParent(canvas.transform);
+                achbox.transform.localScale = Vector3.one;
+                achbox.transform.localPosition = new Vector3(-1016f, 311f, 0f);
+                achbox.name = "AchievementBoxHolder";
+                AchievementHandler.achievement_box = achbox.transform.GetChild(0).gameObject;
+                default_icon = achbox.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite;
+                AchievementHandler.default_icon = default_icon;
+                //ui = GameObject.Instantiate(ab.LoadAsset<GameObject>("AchievementCoreUI.prefab"));
+                //ui.transform.SetParent(canvas.transform, false);
+                //AchievementHandler.menu_parent = canvas.transform.GetChild(0).GetChild(0).gameObject;
+                //ui.transform.localPosition = new Vector3(-521f, -564f, 0f);
+                //ui.transform.localScale = new Vector3(1.1f, 1.1f, 0.8f);
+                //ui.transform.Find("MENU_PARENT/Button/Text").GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
+                //AchievementHandler.ui = ui;
                 LoadAchievements();
                 GameObject.DontDestroyOnLoad(g);
-                GameObject.DontDestroyOnLoad(ui);
+                //GameObject.DontDestroyOnLoad(achbox);
+                //GameObject.DontDestroyOnLoad(ui);
                 ModConsole.Log("<color=yellow>Achievement Core loaded succesfully!</color>");
                 ab.Unload(false);
             }
             else
             {
-                ui.transform.localPosition = new Vector3(-521f, -564f, 0f);
-                ui.transform.localScale = new Vector3(1.1f, 1.1f, 0.8f);
-                ui.transform.Find("MENU_PARENT/Button/Text").GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
+                //ui.transform.localPosition = new Vector3(-521f, -564f, 0f);
+                //ui.transform.localScale = new Vector3(1.1f, 1.1f, 0.8f);
+                //ui.transform.Find("MENU_PARENT/Button/Text").GetComponent<Text>().alignment = TextAnchor.MiddleCenter;
                 started = false;
             }
         }
