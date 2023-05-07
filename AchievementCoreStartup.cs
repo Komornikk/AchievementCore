@@ -50,7 +50,7 @@ namespace AchievementCore
                 achbox.transform.localPosition = new Vector3(-1016f, 311f, 0f);
                 achbox.name = "AchievementBoxHolder";
                 AchievementHandler.achievement_box = achbox.transform.GetChild(0).gameObject;
-                default_icon = achbox.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite;
+                default_icon = achbox.transform.GetChild(0).GetChild(2).GetChild(0).GetComponent<Image>().sprite;
                 AchievementHandler.default_icon = default_icon;
                 //ui = GameObject.Instantiate(ab.LoadAsset<GameObject>("AchievementCoreUI.prefab"));
                 //ui.transform.SetParent(canvas.transform, false);

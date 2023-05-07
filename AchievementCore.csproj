@@ -57,7 +57,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AchievementCore.cs" />
     <Compile Include="AchievementHandler.cs" />
     <Compile Include="AchievementIDHolder.cs" />
     <Compile Include="AchievementCoreStartup.cs" />

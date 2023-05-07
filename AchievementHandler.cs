@@ -64,8 +64,8 @@ namespace AchievementCore
         */
         private IEnumerator TriggerAchievementBox(string name, string description, Sprite icon)
         {
-            achievement_box.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = name;
-            achievement_box.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = description;
+            achievement_box.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = name.ToUpper();
+            achievement_box.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = description.ToUpper();
             achievement_box.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite = icon;
             achievement_box.GetComponent<Animation>().Play("in");
             yield return new WaitForSeconds(6f);
