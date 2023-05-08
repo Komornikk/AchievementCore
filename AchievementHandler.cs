@@ -1,15 +1,27 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 namespace AchievementCore
 {
     public class AchievementHandler : MonoBehaviour
     {
-        //private static GameObject OptionsMenu, ui, menu_parent;
         public GameObject achievement_box;
-        private bool set = false;
         public Sprite default_icon;
-        //private GameObject achievement_box;
+        private Text header, description_text;
+        private Image Icon;
+        private Animation anim;
+        private bool playing = false;
+        private List<string> na = new List<string>();
+        private List<string> de = new List<string>();
+        private List<Sprite> ic = new List<Sprite>();
+        private void Start()
+        {
+            header = achievement_box.transform.GetChild(0).GetChild(0).GetComponent<Text>();
+            description_text = achievement_box.transform.GetChild(1).GetChild(0).GetComponent<Text>();
+            Icon = achievement_box.transform.GetChild(2).GetChild(0).GetComponent<Image>();
+            anim = achievement_box.GetComponent<Animation>();
+        }
         public void TriggerAchievement(string achievement_id, string achievement_name, string achievement_description, Sprite icon)
         {
             if (AchievementIDHolder.unlocked_achievements.Contains(achievement_id)) return;
@@ -23,7 +35,6 @@ namespace AchievementCore
                 AchievementIDHolder.unlocked_achievements.Add(achievement_id);
                 AchievementIDHolder.locked_achievements.Remove(achievement_id);
                 StartCoroutine(TriggerAchievementBox(achievement_name, achievement_description, icon));
-                //MSCLoader.ModConsole.Print("Achievement Get!\n" + achievement_name + "\n" + achievement_description);
                 return;
             }
             else
@@ -45,7 +56,6 @@ namespace AchievementCore
                 AchievementIDHolder.unlocked_achievements.Add(achievement_id);
                 AchievementIDHolder.locked_achievements.Remove(achievement_id);
                 StartCoroutine(TriggerAchievementBox(achievement_name, achievement_description));
-                //MSCLoader.ModConsole.Print("Achievement Get!\n" + achievement_name + "\n" + achievement_description);
                 return;
             }
             else
@@ -54,50 +64,65 @@ namespace AchievementCore
                 return;
             }
         }
-        /*
-        private void TriggerAchievementBox(string name, string description)
+        private void AddToQueue(string n, string d, Sprite i)
         {
-            achievement_box.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = name;
-            achievement_box.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = description;
-            achievement_box.GetComponent<Animation>
+            na.Add(n);
+            de.Add(d);
+            ic.Add(i);
         }
-        */
+        private void NextAchievement()
+        {
+            if (na != null && de != null && ic != null)
+            {
+                StartCoroutine(TriggerAchievementBox(na[0], de[0], ic[0]));
+                RemoveFromQueue();
+            }
+            else return;
+        }
+        private void RemoveFromQueue()
+        {
+            na.Remove(na[0]);
+            de.Remove(de[0]);
+            ic.Remove(ic[0]);
+        }
         private IEnumerator TriggerAchievementBox(string name, string description, Sprite icon)
         {
-            achievement_box.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = name.ToUpper();
-            achievement_box.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = description.ToUpper();
-            achievement_box.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite = icon;
-            achievement_box.GetComponent<Animation>().Play("in");
+            if (playing)
+            {
+                AddToQueue(name, description, icon);
+                StopCoroutine(TriggerAchievementBox(name, description, icon));
+            }
+            playing = true;
+            header.text = name.ToUpper();
+            description_text.text = description.ToUpper();
+            Icon.sprite = icon;
+            anim.Play("in");
             yield return new WaitForSeconds(6f);
-            achievement_box.GetComponent<Animation>().Play("out");
+            anim.Play("out");
+            yield return new WaitForSeconds(anim["out"].length + anim["out"].normalizedTime);
+            playing = false;
+            NextAchievement();
         }
         private IEnumerator TriggerAchievementBox(string name, string description)
         {
-            achievement_box.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = name;
-            achievement_box.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = description;
-            achievement_box.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite = default_icon;
-            achievement_box.GetComponent<Animation>().Play("in");
-            yield return new WaitForSeconds(6f);
-            achievement_box.GetComponent<Animation>().Play("out");
-        }
-        /*
-        void Update()
-        {
-            if (Application.loadedLevelName == "GAME")
+            if (playing)
             {
-                if (OptionsMenu == null) OptionsMenu = GameObject.Find("Systems").transform.Find("OptionsMenu").gameObject;
-                menu_parent.SetActive(OptionsMenu.activeSelf);
+                AddToQueue(name, description, default_icon);
+                StopCoroutine(TriggerAchievementBox(name, description));
+            }
+            else
+            {
+                playing = true;
+                header.text = name.ToUpper();
+                description_text.text = description.ToUpper();
+                Icon.sprite = default_icon;
+                anim.Play("in");
+                yield return new WaitForSeconds(6f);
+                anim.Play("out");
+                yield return new WaitForSeconds(anim["out"].length + anim["out"].normalizedTime);
+                playing = false;
+                NextAchievement();
             }
         }
-        void LateUpdate()
-        {
-            if (Application.loadedLevelName == "GAME" && !set)
-            {
-                set = true;
-                ui.transform.localPosition = new Vector3(-334f, -205f, 0f);
-                ui.transform.Find("MENU_PARENT/Button/Text").GetComponent<Text>().alignment = TextAnchor.MiddleRight;
-            }
-        }
-        */
     }
 }

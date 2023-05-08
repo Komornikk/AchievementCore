@@ -61,8 +61,6 @@ namespace AchievementCore
                 //AchievementHandler.ui = ui;
                 LoadAchievements();
                 GameObject.DontDestroyOnLoad(g);
-                //GameObject.DontDestroyOnLoad(achbox);
-                //GameObject.DontDestroyOnLoad(ui);
                 ModConsole.Log("<color=yellow>Achievement Core loaded succesfully!</color>");
                 ab.Unload(false);
             }
