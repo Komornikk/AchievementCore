@@ -60,6 +60,7 @@
     <Compile Include="AchievementHandler.cs" />
     <Compile Include="AchievementIDHolder.cs" />
     <Compile Include="AchievementCoreStartup.cs" />
+    <Compile Include="CanvasController.cs" />
     <Compile Include="SaveBytes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -6,7 +6,7 @@ namespace AchievementCore
 {
     public class AchievementHandler : MonoBehaviour
     {
-        public GameObject achievement_box;
+        public GameObject achievement_box, box_prefab, ui, filler;
         public Sprite default_icon;
         private Text header, description_text;
         private Image Icon;
@@ -22,7 +22,7 @@ namespace AchievementCore
             Icon = achievement_box.transform.GetChild(2).GetChild(0).GetComponent<Image>();
             anim = achievement_box.GetComponent<Animation>();
         }
-        public void TriggerAchievement(string achievement_id, string achievement_name, string achievement_description, Sprite icon)
+        public void TriggerAchievement(string mod_id, string achievement_id, string achievement_name, string achievement_description, Sprite icon)
         {
             if (AchievementIDHolder.unlocked_achievements.Contains(achievement_id)) return;
             if (AchievementIDHolder.Achievement_IDs.Count != 0)
@@ -43,7 +43,7 @@ namespace AchievementCore
                 return;
             }
         }
-        public void TriggerAchievement(string achievement_id, string achievement_name, string achievement_description)
+        public void TriggerAchievement(string mod_id, string achievement_id, string achievement_name, string achievement_description)
         {
             if (AchievementIDHolder.unlocked_achievements.Contains(achievement_id)) return;
             if (AchievementIDHolder.Achievement_IDs.Count != 0)
@@ -123,6 +123,39 @@ namespace AchievementCore
                 playing = false;
                 NextAchievement();
             }
+        }
+        public void GenerateAchievementList(string mod_id)
+        {
+            foreach (GameObject g in ui.transform.GetChild(1).GetChild(1).GetChild(0))
+            {
+                GameObject.Destroy(g);
+            }
+            List<string> names = new List<string>();
+            List<string> desc = new List<string>();
+            //List<Sprite> icons = new List<Sprite>();
+            foreach (string s in AchievementIDHolder.names)
+            {
+                if (s.Contains(mod_id+"_"))
+                {
+                    names.Add(s.Replace(mod_id + "_", ""));
+                }
+            }
+            foreach (string s in AchievementIDHolder.descs)
+            {
+                if (s.Contains(mod_id + "_"))
+                {
+                    desc.Add(s.Replace(mod_id+"_", ""));
+                }
+            }
+            for (int i = 0; i < names.Count; i++)
+            {
+                GameObject inst = GameObject.Instantiate(box_prefab);
+                inst.transform.SetParent(ui.transform.GetChild(1).GetChild(1).GetChild(0));
+                inst.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = names[i];
+                inst.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = desc[i];
+                //inst.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite = icons[i];
+            }
+            GameObject.Instantiate(filler).transform.SetParent(ui.transform.GetChild(1).GetChild(0));
         }
     }
 }
