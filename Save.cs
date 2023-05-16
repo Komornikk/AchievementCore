@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
 /// <summary>Saves classes with BinaryFormatters</summary>
-public static class SaveBytes
+public static class Save
 {
     static readonly StreamingContext sc = new StreamingContext(StreamingContextStates.All);
     static readonly BinaryFormatter bf = getBinaryFormatter();

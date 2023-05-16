@@ -4,23 +4,23 @@ namespace AchievementCore
 {
     public static class AchievementIDHolder 
     {
+        public struct AchievementData
+        {
+            public string mod_id;
+            public string name;
+            public string description;
+            public bool hidden;
+        }
         public static List<string> Achievement_IDs;
         public static List<string> unlocked_achievements;
         public static List<string> locked_achievements;
-        public static List<string> mod_id;
-        public static List<string> names;
-        public static List<string> descs;
         public static List<Sprite> images;
         public static AchievementHandler AchievementHandler;
+        public static Dictionary<string, AchievementData> achievements;
+
         static AchievementIDHolder()
         {
-            Achievement_IDs = new List<string>();
-            unlocked_achievements = new List<string>();
-            locked_achievements = new List<string>();
-            mod_id = new List<string>();
-            names = new List<string>();
-            descs = new List<string>();
-            images = new List<Sprite>();
+            achievements = new Dictionary<string, AchievementData>();
         }
     }
 }

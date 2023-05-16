@@ -43,24 +43,20 @@ namespace AchievementCore
                 return;
             }
         }
-        public void TriggerAchievement(string mod_id, string achievement_id, string achievement_name, string achievement_description)
+        public void TriggerAchievement(string mod_id, string achievement_id)
         {
-            if (AchievementIDHolder.unlocked_achievements.Contains(achievement_id)) return;
-            if (AchievementIDHolder.Achievement_IDs.Count != 0)
+            if (AchievementIDHolder.achievements.ContainsKey(achievement_id))
             {
-                if (!AchievementIDHolder.Achievement_IDs.Contains(achievement_id))
-                {
-                    MSCLoader.ModConsole.Error("Achievement ID doesn't exist! Maybe you forgot to add it to the AchievementIDHolder?");
-                    return;
-                }
+                AchievementIDHolder.AchievementData ad = AchievementIDHolder.achievements[achievement_id];
+                //MSCLoader.ModConsole.Print(ad.locked);
+                //if (!ad.locked) return;
+                //ad.locked = false;
+                //MSCLoader.ModConsole.Print(ad.locked);
+                if (!AchievementIDHolder.locked_achievements.Contains(achievement_id)) return;
                 AchievementIDHolder.unlocked_achievements.Add(achievement_id);
                 AchievementIDHolder.locked_achievements.Remove(achievement_id);
-                StartCoroutine(TriggerAchievementBox(achievement_name, achievement_description));
-                return;
-            }
-            else
-            {
-                MSCLoader.ModConsole.Error("The Achievement_IDs list is empty!");
+                GenerateAchievementList(mod_id);
+                StartCoroutine(TriggerAchievementBox(ad.name.Replace(mod_id, ""), ad.description));
                 return;
             }
         }
@@ -126,36 +122,39 @@ namespace AchievementCore
         }
         public void GenerateAchievementList(string mod_id)
         {
-            foreach (GameObject g in ui.transform.GetChild(1).GetChild(1).GetChild(0))
+            //remove existing boxes
+            foreach (Transform child in ui.transform.GetChild(1).GetChild(1).GetChild(0))
             {
-                GameObject.Destroy(g);
+                GameObject.Destroy(child.gameObject);
             }
-            List<string> names = new List<string>();
-            List<string> desc = new List<string>();
-            //List<Sprite> icons = new List<Sprite>();
-            foreach (string s in AchievementIDHolder.names)
+            //generate achievement boxes
+            foreach (string id in AchievementIDHolder.achievements.Keys)
             {
-                if (s.Contains(mod_id+"_"))
+                AchievementIDHolder.AchievementData achievementData = AchievementIDHolder.achievements[id];
+                if (achievementData.mod_id == mod_id)
                 {
-                    names.Add(s.Replace(mod_id + "_", ""));
+                    GameObject inst = GameObject.Instantiate(box_prefab);
+                    inst.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = achievementData.name.ToUpper();
+                    inst.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = achievementData.description.ToUpper();
+                    inst.transform.SetParent(ui.transform.GetChild(1).GetChild(1).GetChild(0));
+                    inst.name = $"Achievement_{id}";
+                    /*
+                    if (achievementData.hidden)
+                    {
+                        // do something for hidden
+                    }
+                    else if (AchievementIDHolder.locked_achievements.Contains(id))
+                    {
+                        inst.transform.GetChild(2).GetChild(0).gameObject.SetActive(false);
+                        inst.transform.GetChild(2).GetChild(1).gameObject.SetActive(true);
+                    }
+                    */
                 }
+                //else /*MSCLoader.ModConsole.Error($"AchievementCore: No Mod ID for achievement {id}!"); */MSCLoader.ModConsole.Error($"id one:{id}  id two: {mod_id}");
             }
-            foreach (string s in AchievementIDHolder.descs)
-            {
-                if (s.Contains(mod_id + "_"))
-                {
-                    desc.Add(s.Replace(mod_id+"_", ""));
-                }
-            }
-            for (int i = 0; i < names.Count; i++)
-            {
-                GameObject inst = GameObject.Instantiate(box_prefab);
-                inst.transform.SetParent(ui.transform.GetChild(1).GetChild(1).GetChild(0));
-                inst.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = names[i];
-                inst.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = desc[i];
-                //inst.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite = icons[i];
-            }
-            GameObject.Instantiate(filler).transform.SetParent(ui.transform.GetChild(1).GetChild(0));
+
+            //add filler box so the last achievement box doesn't get cut in half by the list 
+            GameObject.Instantiate(filler).transform.SetParent(ui.transform.GetChild(1).GetChild(1).GetChild(0));
         }
     }
 }
