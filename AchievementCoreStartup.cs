@@ -6,15 +6,28 @@ using UnityEngine.UI;
 
 namespace AchievementCore
 {
-    public static class AchievementCoreStartup
+    public class AchievementCore : Mod
     {
-        private static bool started = false, saving = false, onload = false;
+        public override string ID => "AchievementCore";
+        public override string Name => "Achievement Core";
+        public override string Author => "komornik";
+        public override string Version => "1.0.0";
+        public override string Description => "Achievement system for all your mods!";
+
+        private static bool started = false, saving = false, onload = false, initialized = false;
         private static GameObject canvas, achbox, coreGO, achievementExplorer, filler, box_prefab;
         private static AssetBundle ab;
         private static AchievementHandler AchievementHandler;
         static Sprite default_icon;
         private static readonly string saveFile = Application.persistentDataPath + "\\Achievements.dat";
-        public static void OnLoad()
+
+        public override void ModSetup()
+        {
+            SetupFunction(Setup.OnMenuLoad, Mod_OnMenuLoad);
+            SetupFunction(Setup.OnLoad, Mod_OnLoad);
+            SetupFunction(Setup.OnSave, Mod_OnSave);
+        }
+        public void Mod_OnLoad()
         {
             if (!onload)
             {
@@ -26,10 +39,11 @@ namespace AchievementCore
                 GameObject.DontDestroyOnLoad(canvas);
             }
         }
-        public static void Startup()
+        public void Mod_OnMenuLoad()
         {
-            if (!started)
+            if (!started && !initialized)
             {
+                initialized = true;
                 started = true;
                 onload = false;
                 coreGO = new GameObject("AchievementCore");
@@ -79,7 +93,7 @@ namespace AchievementCore
         private static void LoadAchievements()
         {
         }
-        public static void SaveAchievements()
+        public void Mod_OnSave()
         {
 
         }

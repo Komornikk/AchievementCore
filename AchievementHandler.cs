@@ -123,7 +123,7 @@ namespace AchievementCore
         public void GenerateAchievementList(string mod_id)
         {
             //remove existing boxes
-            foreach (Transform child in ui.transform.GetChild(1).GetChild(1).GetChild(0))
+            foreach (Transform child in ui.transform.GetChild(0).GetChild(1).GetChild(1).GetChild(0))
             {
                 GameObject.Destroy(child.gameObject);
             }
@@ -136,7 +136,7 @@ namespace AchievementCore
                     GameObject inst = GameObject.Instantiate(box_prefab);
                     inst.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = achievementData.name.ToUpper();
                     inst.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = achievementData.description.ToUpper();
-                    inst.transform.SetParent(ui.transform.GetChild(1).GetChild(1).GetChild(0));
+                    inst.transform.SetParent(ui.transform.GetChild(0).GetChild(1).GetChild(1).GetChild(0));
                     inst.name = $"Achievement_{id}";
                     /*
                     if (achievementData.hidden)
@@ -154,7 +154,7 @@ namespace AchievementCore
             }
 
             //add filler box so the last achievement box doesn't get cut in half by the list 
-            GameObject.Instantiate(filler).transform.SetParent(ui.transform.GetChild(1).GetChild(1).GetChild(0));
+            GameObject.Instantiate(filler).transform.SetParent(ui.transform.GetChild(0).GetChild(1).GetChild(1).GetChild(0));
         }
     }
 }

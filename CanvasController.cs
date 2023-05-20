@@ -7,7 +7,7 @@ namespace AchievementCore
     public class CanvasController : MonoBehaviour
     {
 
-        private GameObject button, options_menu, console;
+        private GameObject disableUI, options_menu, console;
         public AchievementHandler ah;
         public GameObject ui;
         public Text mod_text;
@@ -19,8 +19,9 @@ namespace AchievementCore
         public void Start()
         {
             //List<string> achievementKeys = new List<string>(AchievementIDHolder.achievements.Keys);
-            ui = transform.GetChild(1).gameObject;
+            ui = transform.GetChild(0).GetChild(1).gameObject;
             console = FindObjectsOfType<MSCLoader.ConsoleView>()[0].transform.GetChild(0).gameObject;
+            disableUI = transform.GetChild(0).gameObject;
             foreach (string s in AchievementIDHolder.achievements.Keys)
             {
                 if (!mod_ids.Contains(s)) mod_ids.Add(AchievementIDHolder.achievements[s].mod_id);
@@ -31,16 +32,6 @@ namespace AchievementCore
         {
             options_menu = GameObject.Find("Systems").transform.Find("OptionsMenu").gameObject;
         }
-        /*
-        private List<string> GetAllModIDs()
-        {
-            List<string> achievementKeys = new List<string>();
-            foreach (string s in mod_ids)
-            {
-
-            }
-        }
-        */
         public void ButtonPress(int side)
         {
             // Get the list of achievement keys for the given mod_id
@@ -96,8 +87,8 @@ namespace AchievementCore
         }
         private void Update()
         {
-            if (!onLoad) button.SetActive(!console.activeSelf);
-            if (onLoad) button.SetActive(options_menu.activeInHierarchy);
+            if (!onLoad) disableUI.SetActive(!console.activeSelf);
+            if (onLoad) disableUI.SetActive(options_menu.activeInHierarchy);
         }
     }
 }
