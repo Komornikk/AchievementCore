@@ -9,11 +9,11 @@ namespace AchievementCore
             public string mod_id;
             public string name;
             public string description;
+            public Sprite icon;
             public bool hidden;
         }
-        public static List<string> Achievement_IDs;
-        public static List<string> unlocked_achievements;
-        public static List<string> locked_achievements;
+        public static List<string> unlocked_achievements = new List<string>();
+        public static List<string> locked_achievements = new List<string>();
         public static List<Sprite> images;
         public static AchievementHandler AchievementHandler;
         public static Dictionary<string, AchievementData> achievements;

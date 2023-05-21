@@ -1,9 +1,9 @@
 ﻿using MSCLoader;
 using UnityEngine;
 using System.IO;
-using System.Collections.Generic;
+using System.Linq;
+using System.Collections;
 using UnityEngine.UI;
-
 namespace AchievementCore
 {
     public class AchievementCore : Mod
@@ -14,10 +14,10 @@ namespace AchievementCore
         public override string Version => "1.0.0";
         public override string Description => "Achievement system for all your mods!";
 
-        private static bool started = false, saving = false, onload = false, initialized = false;
         private static GameObject canvas, achbox, coreGO, achievementExplorer, filler, box_prefab;
         private static AssetBundle ab;
         private static AchievementHandler AchievementHandler;
+        private static CanvasController cc;
         static Sprite default_icon;
         private static readonly string saveFile = Application.persistentDataPath + "\\Achievements.dat";
 
@@ -26,76 +26,141 @@ namespace AchievementCore
             SetupFunction(Setup.OnMenuLoad, Mod_OnMenuLoad);
             SetupFunction(Setup.OnLoad, Mod_OnLoad);
             SetupFunction(Setup.OnSave, Mod_OnSave);
+            SetupFunction(Setup.Update, Mod_Update);
         }
-        public void Mod_OnLoad()
+        public void Mod_Update()
         {
-            if (!onload)
+            if (Input.GetKeyDown(KeyCode.G))
             {
-                onload = true;
-                achievementExplorer.GetComponent<CanvasController>().FindOptionsMenu();
-                achievementExplorer.GetComponent<CanvasController>().onLoad = true;
-                achievementExplorer.GetComponent<CanvasController>().ui.SetActive(false);
-                GameObject.DontDestroyOnLoad(coreGO);
-                GameObject.DontDestroyOnLoad(canvas);
+                PrintAllIDs();
             }
         }
-        public void Mod_OnMenuLoad()
+        void PrintAllIDs()
         {
-            if (!started && !initialized)
+            MSCLoader.ModConsole.Print("<color=red>UNLOCKED ACHIEVEMENTS:</color>");
+            if(AchievementIDHolder.unlocked_achievements.Count > 0)
             {
-                initialized = true;
-                started = true;
-                onload = false;
-                coreGO = new GameObject("AchievementCore");
-                AchievementHandler = coreGO.AddComponent<AchievementHandler>();
-                AchievementIDHolder.AchievementHandler = AchievementHandler;
-                canvas = ModUI.CreateCanvas("AchievementCoreUI", true);
-                ab = LoadAssets.LoadBundle("AchievementCore.Assets.achcore.unity3d");
-                box_prefab = ab.LoadAsset<GameObject>("AchievementBox.prefab");
-                AchievementHandler.box_prefab = box_prefab;
-                achbox = GameObject.Instantiate(ab.LoadAsset<GameObject>("achbox.prefab"));
-                achbox.transform.SetParent(canvas.transform);
-                achbox.transform.localScale = Vector3.one;
-                achbox.transform.localPosition = new Vector3(-1066f, 364f, 0f);
-                achbox.name = "AchievementBoxHolder";
-                achievementExplorer = GameObject.Instantiate(ab.LoadAsset<GameObject>("AchievementUI.prefab"));
-                achievementExplorer.transform.SetParent(canvas.transform);
-                achievementExplorer.transform.localPosition = new Vector3(-483f, -89f, 0);
-                achievementExplorer.name = "AchievementUI";
-                AchievementHandler.ui = achievementExplorer; 
-                achievementExplorer.GetComponent<CanvasController>().onLoad = false;
-                achievementExplorer.GetComponent<CanvasController>().ah = AchievementHandler;
-                //achievementExplorer.GetComponent<CanvasController>().ui.SetActive(false);
-                //achievementExplorer.AddComponent<CanvasController>();
-                filler = ab.LoadAsset<GameObject>("filler.prefab");
-                AchievementHandler.filler = filler;
-                AchievementHandler.achievement_box = achbox.transform.GetChild(0).gameObject;
-                default_icon = achbox.transform.GetChild(0).GetChild(2).GetChild(0).GetComponent<Image>().sprite;
-                AchievementHandler.default_icon = default_icon;
-                //LoadAchievements();
-                GameObject.DontDestroyOnLoad(coreGO);
-                //if(AchievementIDHolder.achievements.Keys != null)
-                //{
-                //    foreach (string key in AchievementIDHolder.achievements.Keys)
-                //    {
-                //        AchievementIDHolder.locked_achievements.Add(key);
-                //    }
-                //}
-                //AchievementHandler.GenerateAchievementList("StorageShed");
-                ModConsole.Log("<color=yellow>Achievement Core loaded succesfully!</color>");
-                ab.Unload(false);
+                foreach (string s in AchievementIDHolder.unlocked_achievements)
+                {
+                    ModConsole.Print(s);
+                }
             }
             else
             {
-                started = false;
+                ModConsole.Print("<color=green>There are no unlocked achievements</color>");
+            }
+            MSCLoader.ModConsole.Print("<color=red>LOCKED ACHIEVEMENTS:</color>");
+            if (AchievementIDHolder.locked_achievements.Count == 0)
+            {
+                ModConsole.Print("<color=green>There are no locked achievements</color>");
+            }
+            else
+            {
+                foreach (string s in AchievementIDHolder.locked_achievements)
+                {
+                    MSCLoader.ModConsole.Print(s);
+                }
+            }
+        }
+        public void Mod_OnLoad()
+        {
+            achievementExplorer.GetComponent<CanvasController>().FindOptionsMenu();
+            achievementExplorer.GetComponent<CanvasController>().onLoad = true;
+            achievementExplorer.GetComponent<CanvasController>().ui.SetActive(false);
+        }
+        public void Mod_OnMenuLoad()
+        {
+            AchievementIDHolder.achievements.Clear();
+            coreGO = new GameObject("AchievementCore");
+            AchievementHandler = coreGO.AddComponent<AchievementHandler>();
+            AchievementIDHolder.AchievementHandler = AchievementHandler;
+            canvas = ModUI.CreateCanvas("AchievementCoreUI", true);
+            ab = LoadAssets.LoadBundle("AchievementCore.Assets.achcore.unity3d");
+            box_prefab = ab.LoadAsset<GameObject>("AchievementBox.prefab");
+            AchievementHandler.box_prefab = box_prefab;
+            achbox = GameObject.Instantiate(ab.LoadAsset<GameObject>("achbox.prefab"));
+            achbox.transform.SetParent(canvas.transform);
+            achbox.transform.localScale = Vector3.one;
+            achbox.transform.localPosition = new Vector3(-1066f, 361f, 0f);
+            achbox.name = "AchievementBoxHolder";
+            achievementExplorer = GameObject.Instantiate(ab.LoadAsset<GameObject>("AchievementUI.prefab"));
+            achievementExplorer.transform.SetParent(canvas.transform);
+            achievementExplorer.transform.localPosition = new Vector3(-483f, -89f, 0);
+            achievementExplorer.name = "AchievementUI";
+            AchievementHandler.ui = achievementExplorer;
+            cc = achievementExplorer.GetComponent<CanvasController>();
+            cc.onLoad = false;
+            cc.ah = AchievementHandler;
+            filler = ab.LoadAsset<GameObject>("filler.prefab");
+            AchievementHandler.filler = filler;
+            AchievementHandler.achievement_box = achbox.transform.GetChild(0).gameObject;
+            default_icon = achbox.transform.GetChild(0).GetChild(2).GetChild(0).GetComponent<Image>().sprite;
+            AchievementHandler.default_icon = default_icon;
+            GameObject.DontDestroyOnLoad(coreGO);
+            ModConsole.Log("<color=yellow>Achievement Core loaded succesfully!</color>");
+            AddBaseAchievements();
+            AchievementHandler.TriggerAchievement("base", "achcore_using_achcore");
+            ab.Unload(false);
+            AchievementHandler.StartSecondPass();
+        }
+        void AddBaseAchievements()
+        {
+            AchievementIDHolder.achievements.Add("achcore_using_achcore", new AchievementIDHolder.AchievementData
+            {
+                mod_id = "base",
+                name = "Achievement Get!",
+                description = "You're a user of Achievement Core!",
+                icon = null,
+                hidden = false,
+            });
+        }
+        public static IEnumerator SecondPassMenu()
+        {
+            yield return null;
+            AchievementIDHolder.locked_achievements.AddRange(AchievementIDHolder.achievements.Keys.ToList());
+            LoadAchievements();
+            foreach (string s in AchievementIDHolder.achievements.Keys)
+            {
+                if (!cc.mod_ids.Contains(s)) cc.mod_ids.Add(AchievementIDHolder.achievements[s].mod_id);
+            }
+            if (cc.mod_text.text == "NULLNULLNULL")
+            {
+                cc.GetRandomAchievementKey();
+            }
+            foreach (string s in cc.mod_ids)
+            {
+                ModConsole.Print(s);
             }
         }
         private static void LoadAchievements()
         {
+            if (File.Exists(saveFile))
+            {
+                using (var binaryReader = new BinaryReader(File.Open(saveFile, FileMode.Open)))
+                {
+                    int count = binaryReader.ReadInt32();
+                    //MSCLoader.ModConsole.Print(count);
+                    AchievementIDHolder.unlocked_achievements.Clear();
+                    for (int i = 0; i < count; i++)
+                    {
+                        string id = binaryReader.ReadString();
+                        AchievementIDHolder.unlocked_achievements.Add(id);
+                        AchievementIDHolder.locked_achievements.Remove(id);
+                    }
+                }
+            }
         }
         public void Mod_OnSave()
         {
-
+            using (var binaryWriter = new BinaryWriter(File.Open(saveFile, FileMode.Create)))
+            {
+                binaryWriter.Write(AchievementIDHolder.unlocked_achievements.Count);
+                foreach (string id in AchievementIDHolder.unlocked_achievements)
+                {
+                    binaryWriter.Write(id);
+                }
+            }
         }
+
     }
 }

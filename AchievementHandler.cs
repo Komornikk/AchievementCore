@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 namespace AchievementCore
 {
     public class AchievementHandler : MonoBehaviour
@@ -15,6 +16,10 @@ namespace AchievementCore
         private List<string> na = new List<string>();
         private List<string> de = new List<string>();
         private List<Sprite> ic = new List<Sprite>();
+        public void StartSecondPass()
+        {
+            StartCoroutine(AchievementCore.SecondPassMenu());
+        }
         private void Start()
         {
             header = achievement_box.transform.GetChild(0).GetChild(0).GetComponent<Text>();
@@ -22,41 +27,16 @@ namespace AchievementCore
             Icon = achievement_box.transform.GetChild(2).GetChild(0).GetComponent<Image>();
             anim = achievement_box.GetComponent<Animation>();
         }
-        public void TriggerAchievement(string mod_id, string achievement_id, string achievement_name, string achievement_description, Sprite icon)
-        {
-            if (AchievementIDHolder.unlocked_achievements.Contains(achievement_id)) return;
-            if (AchievementIDHolder.Achievement_IDs.Count != 0)
-            {
-                if (!AchievementIDHolder.Achievement_IDs.Contains(achievement_id))
-                {
-                    MSCLoader.ModConsole.Error("Achievement ID doesn't exist! Maybe you forgot to add it to the AchievementIDHolder?");
-                    return;
-                }
-                AchievementIDHolder.unlocked_achievements.Add(achievement_id);
-                AchievementIDHolder.locked_achievements.Remove(achievement_id);
-                StartCoroutine(TriggerAchievementBox(achievement_name, achievement_description, icon));
-                return;
-            }
-            else
-            {
-                MSCLoader.ModConsole.Error("The Achievement_IDs list is empty!");
-                return;
-            }
-        }
         public void TriggerAchievement(string mod_id, string achievement_id)
         {
             if (AchievementIDHolder.achievements.ContainsKey(achievement_id))
             {
                 AchievementIDHolder.AchievementData ad = AchievementIDHolder.achievements[achievement_id];
-                //MSCLoader.ModConsole.Print(ad.locked);
-                //if (!ad.locked) return;
-                //ad.locked = false;
-                //MSCLoader.ModConsole.Print(ad.locked);
-                if (!AchievementIDHolder.locked_achievements.Contains(achievement_id)) return;
+                if (AchievementIDHolder.unlocked_achievements.Contains(achievement_id)) return;
                 AchievementIDHolder.unlocked_achievements.Add(achievement_id);
                 AchievementIDHolder.locked_achievements.Remove(achievement_id);
-                GenerateAchievementList(mod_id);
-                StartCoroutine(TriggerAchievementBox(ad.name.Replace(mod_id, ""), ad.description));
+                //MSCLoader.ModConsole.Print($"is icon null?: {ad.icon == null}");
+                StartCoroutine(TriggerAchievementBox(ad.name, ad.description, ad.icon));
                 return;
             }
         }
@@ -91,33 +71,44 @@ namespace AchievementCore
             playing = true;
             header.text = name.ToUpper();
             description_text.text = description.ToUpper();
-            Icon.sprite = icon;
+            Icon.sprite = icon == null ? default_icon : icon;
             anim.Play("in");
-            yield return new WaitForSeconds(6f);
+            yield return new WaitForSeconds(5f);
             anim.Play("out");
             yield return new WaitForSeconds(anim["out"].length + anim["out"].normalizedTime);
             playing = false;
             NextAchievement();
         }
-        private IEnumerator TriggerAchievementBox(string name, string description)
+        void GenerateBox(string id, bool locked, bool hidden)
         {
-            if (playing)
+            if (!ui.transform.GetChild(0).GetChild(1).GetChild(1).GetChild(0).Find($"Achievement_{id}"))
             {
-                AddToQueue(name, description, default_icon);
-                StopCoroutine(TriggerAchievementBox(name, description));
-            }
-            else
-            {
-                playing = true;
-                header.text = name.ToUpper();
-                description_text.text = description.ToUpper();
-                Icon.sprite = default_icon;
-                anim.Play("in");
-                yield return new WaitForSeconds(6f);
-                anim.Play("out");
-                yield return new WaitForSeconds(anim["out"].length + anim["out"].normalizedTime);
-                playing = false;
-                NextAchievement();
+                AchievementIDHolder.AchievementData achievementData = AchievementIDHolder.achievements[id];
+                GameObject inst = GameObject.Instantiate(box_prefab);
+                inst.transform.SetParent(ui.transform.GetChild(0).GetChild(1).GetChild(1).GetChild(0));
+                inst.name = $"Achievement_{id}";
+                if (locked && !hidden)
+                {
+                    inst.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = achievementData.name.ToUpper();
+                    inst.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = achievementData.description.ToUpper();
+                    inst.transform.GetChild(2).GetChild(0).gameObject.SetActive(false);
+                    inst.transform.GetChild(2).GetChild(1).gameObject.SetActive(true);
+                    return;
+                }
+                else if (hidden && locked)
+                {
+                    inst.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = "hidden achievement".ToUpper();
+                    inst.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = "content will reveal after unlocking the achievement".ToUpper();
+                    inst.transform.GetChild(2).GetChild(0).gameObject.SetActive(false);
+                    inst.transform.GetChild(2).GetChild(2).gameObject.SetActive(true);
+                    return;
+                }
+                else
+                {
+                    inst.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = achievementData.name.ToUpper();
+                    inst.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = achievementData.description.ToUpper();
+                    if (achievementData.icon != null) inst.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite = achievementData.icon;
+                }
             }
         }
         public void GenerateAchievementList(string mod_id)
@@ -127,32 +118,42 @@ namespace AchievementCore
             {
                 GameObject.Destroy(child.gameObject);
             }
-            //generate achievement boxes
+
+            //generate unlocked
+            foreach (string id in AchievementIDHolder.unlocked_achievements)
+            {
+                if (AchievementIDHolder.achievements.TryGetValue(id, out AchievementIDHolder.AchievementData achievementData))
+                {
+                    if (achievementData.mod_id == mod_id)
+                    GenerateBox(id, false, false);
+                }
+            }
+
+            //generate locked
+            foreach (string id in AchievementIDHolder.locked_achievements)
+            {
+                if (AchievementIDHolder.achievements.TryGetValue(id, out AchievementIDHolder.AchievementData achievementData) && !achievementData.hidden)
+                {
+                    if (achievementData.mod_id == mod_id)
+                        GenerateBox(id, true, false);
+                }
+            }
+
+            //generate hidden
             foreach (string id in AchievementIDHolder.achievements.Keys)
             {
                 AchievementIDHolder.AchievementData achievementData = AchievementIDHolder.achievements[id];
-                if (achievementData.mod_id == mod_id)
+                if (achievementData.hidden && !AchievementIDHolder.locked_achievements.Contains(id))
                 {
-                    GameObject inst = GameObject.Instantiate(box_prefab);
-                    inst.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = achievementData.name.ToUpper();
-                    inst.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = achievementData.description.ToUpper();
-                    inst.transform.SetParent(ui.transform.GetChild(0).GetChild(1).GetChild(1).GetChild(0));
-                    inst.name = $"Achievement_{id}";
-                    /*
-                    if (achievementData.hidden)
-                    {
-                        // do something for hidden
-                    }
-                    else if (AchievementIDHolder.locked_achievements.Contains(id))
-                    {
-                        inst.transform.GetChild(2).GetChild(0).gameObject.SetActive(false);
-                        inst.transform.GetChild(2).GetChild(1).gameObject.SetActive(true);
-                    }
-                    */
+                    if (achievementData.mod_id == mod_id)
+                        GenerateBox(id, false, true);
                 }
-                //else /*MSCLoader.ModConsole.Error($"AchievementCore: No Mod ID for achievement {id}!"); */MSCLoader.ModConsole.Error($"id one:{id}  id two: {mod_id}");
+                else if (achievementData.hidden && AchievementIDHolder.locked_achievements.Contains(id))
+                {
+                    if (achievementData.mod_id == mod_id)
+                        GenerateBox(id, true, true);
+                }
             }
-
             //add filler box so the last achievement box doesn't get cut in half by the list 
             GameObject.Instantiate(filler).transform.SetParent(ui.transform.GetChild(0).GetChild(1).GetChild(1).GetChild(0));
         }
