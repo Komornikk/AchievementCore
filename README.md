@@ -12,12 +12,12 @@ Now, add `using AchievementCore;` on the top of your Mod class:
 
 ![image](https://github.com/Komornikk/AchievementCore/assets/96838205/bef09c1b-3707-4243-b20c-5421be2c2ae3)
 
-Adding achievements is quite easy, make sure you have the Mod_OnMenuLoad set up.
+Adding achievements is quite easy, make sure you have the **Mod_OnMenuLoad** set up.
 
 ![image](https://github.com/Komornikk/AchievementCore/assets/96838205/a5afeb3e-b6b6-470a-8448-cd267f2eb4ab)
 
-After you do that, navigate to the Mod_OnMenuLoad function, and add the following:
-`if (ModLoader.IsModPresent("AchievementCore))
+After you do that, navigate to the **Mod_OnMenuLoad** function, and add the following:
+**`if (ModLoader.IsModPresent("AchievementCore))
 {
   AchievementIDHolder.achievements.Add("yourUniqueID", new AchievementIDHolder.AchievementData
             {
@@ -27,6 +27,6 @@ After you do that, navigate to the Mod_OnMenuLoad function, and add the followin
                 icon = null, //your custom icon (sprite); you can null this if you want to use the default icon
                 hidden = true, //leave this at true if you want it to be hidden
             });
-}`
+}`**
 Quite easy, isn't it? Triggering achievements is also really easy! all you have to do is put this line anywhere you want to trigger the achievement!
 `if (ModLoader.IsModPresent("AchievementCore")) if (ModLoader.IsModPresent("AchievementCore"));`
