@@ -23,4 +23,5 @@ After you do that, navigate to the **Mod_OnMenuLoad** function, and add the foll
 It doesn't have to be so spaced out, I did that for tutorial purposes.
 
 Quite easy, isn't it? Triggering achievements is also really easy! all you have to do is put this line anywhere you want to trigger the achievement!
+
 `if (ModLoader.IsModPresent("AchievementCore")) if (ModLoader.IsModPresent("AchievementCore"));`
