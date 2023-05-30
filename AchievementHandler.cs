@@ -7,27 +7,27 @@ namespace AchievementCore
 {
     public class AchievementHandler : MonoBehaviour
     {
-        public GameObject achievement_box, box_prefab, ui, filler;
-        public Sprite default_icon;
+        [SerializeField] private GameObject box_prefab, filler;
+        public GameObject achievement_box, ui;
+        [SerializeField] private Sprite default_icon;
         private Text header, description_text;
         private Image Icon;
         private Animation anim;
         private bool playing = false;
-        private List<string> na = new List<string>();
-        private List<string> de = new List<string>();
-        private List<Sprite> ic = new List<Sprite>();
+        private List<string> queueID = new List<string>();
         public void StartSecondPass()
         {
             StartCoroutine(AchievementCore.SecondPassMenu());
         }
         private void Start()
         {
+            //achievement_box = achievement_box.transform.GetChild(0).gameObject;
             header = achievement_box.transform.GetChild(0).GetChild(0).GetComponent<Text>();
             description_text = achievement_box.transform.GetChild(1).GetChild(0).GetComponent<Text>();
             Icon = achievement_box.transform.GetChild(2).GetChild(0).GetComponent<Image>();
             anim = achievement_box.GetComponent<Animation>();
         }
-        public void TriggerAchievement(string mod_id, string achievement_id)
+        public void TriggerAchievement(string achievement_id)
         {
             if (AchievementIDHolder.achievements.ContainsKey(achievement_id))
             {
@@ -36,48 +36,57 @@ namespace AchievementCore
                 AchievementIDHolder.unlocked_achievements.Add(achievement_id);
                 AchievementIDHolder.locked_achievements.Remove(achievement_id);
                 //MSCLoader.ModConsole.Print($"is icon null?: {ad.icon == null}");
-                StartCoroutine(TriggerAchievementBox(ad.name, ad.description, ad.icon));
+                StartCoroutine(TriggerAchievementBox(ad));
                 return;
             }
         }
-        private void AddToQueue(string n, string d, Sprite i)
+        private void AddToQueue(string ID)
         {
-            na.Add(n);
-            de.Add(d);
-            ic.Add(i);
+            queueID.Add(ID);
         }
         private void NextAchievement()
         {
-            if (na != null && de != null && ic != null)
+            if (queueID != null && queueID.Count > 0)
             {
-                StartCoroutine(TriggerAchievementBox(na[0], de[0], ic[0]));
+                TriggerAchievementBox(AchievementIDHolder.achievements[queueID[0]]);
                 RemoveFromQueue();
             }
             else return;
         }
         private void RemoveFromQueue()
         {
-            na.Remove(na[0]);
-            de.Remove(de[0]);
-            ic.Remove(ic[0]);
+            queueID.Remove(queueID[0]);
         }
-        private IEnumerator TriggerAchievementBox(string name, string description, Sprite icon)
+        private IEnumerator TriggerAchievementBox(AchievementIDHolder.AchievementData ad)
         {
             if (playing)
             {
-                AddToQueue(name, description, icon);
-                StopCoroutine(TriggerAchievementBox(name, description, icon));
+                AddToQueue(GetIDAchievement(ad)); // get the achievement ID based on this 
+                StopCoroutine(TriggerAchievementBox(ad));
             }
             playing = true;
-            header.text = name.ToUpper();
-            description_text.text = description.ToUpper();
-            Icon.sprite = icon == null ? default_icon : icon;
+            header.text = ad.name.ToUpper();
+            description_text.text = ad.description.ToUpper();
+            Icon.sprite = ad.icon == null ? default_icon : ad.icon;
             anim.Play("in");
             yield return new WaitForSeconds(5f);
             anim.Play("out");
             yield return new WaitForSeconds(anim["out"].length + anim["out"].normalizedTime);
             playing = false;
             NextAchievement();
+        }
+        string GetIDAchievement(AchievementIDHolder.AchievementData ad)
+        {
+            string id = null;
+            foreach (var pair in AchievementIDHolder.achievements)
+            {
+                if (pair.Value.Equals(ad))
+                {
+                    id = pair.Key;
+                    break;
+                }
+            }
+            return id;
         }
         void GenerateBox(string id, bool locked, bool hidden)
         {

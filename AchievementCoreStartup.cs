@@ -13,7 +13,7 @@ namespace AchievementCore
         public override string Author => "komornik";
         public override string Version => "1.0.0";
         public override string Description => "Achievement system for all your mods!";
-
+        public static bool DEBUG = false;
         private static GameObject canvas, achbox, coreGO, achievementExplorer, filler, box_prefab;
         private static AssetBundle ab;
         private static AchievementHandler AchievementHandler;
@@ -30,7 +30,7 @@ namespace AchievementCore
         }
         public void Mod_Update()
         {
-            if (Input.GetKeyDown(KeyCode.G))
+            if (Input.GetKeyDown(KeyCode.G) && DEBUG)
             {
                 PrintAllIDs();
             }
@@ -71,13 +71,15 @@ namespace AchievementCore
         public void Mod_OnMenuLoad()
         {
             AchievementIDHolder.achievements.Clear();
-            coreGO = new GameObject("AchievementCore");
-            AchievementHandler = coreGO.AddComponent<AchievementHandler>();
+            ConsoleCommand.Add(new DebugController());
+            ab = LoadAssets.LoadBundle("AchievementCore.Assets.achcore.unity3d");
+            //coreGO = new GameObject("AchievementCore");
+            coreGO = GameObject.Instantiate(ab.LoadAsset<GameObject>("coreGO.prefab"));
+            coreGO.name = "AchievementCore";
+            AchievementHandler = coreGO.GetComponent<AchievementHandler>();
             AchievementIDHolder.AchievementHandler = AchievementHandler;
             canvas = ModUI.CreateCanvas("AchievementCoreUI", true);
-            ab = LoadAssets.LoadBundle("AchievementCore.Assets.achcore.unity3d");
             box_prefab = ab.LoadAsset<GameObject>("AchievementBox.prefab");
-            AchievementHandler.box_prefab = box_prefab;
             achbox = GameObject.Instantiate(ab.LoadAsset<GameObject>("achbox.prefab"));
             achbox.transform.SetParent(canvas.transform);
             achbox.transform.localScale = Vector3.one;
@@ -85,21 +87,19 @@ namespace AchievementCore
             achbox.name = "AchievementBoxHolder";
             achievementExplorer = GameObject.Instantiate(ab.LoadAsset<GameObject>("AchievementUI.prefab"));
             achievementExplorer.transform.SetParent(canvas.transform);
-            achievementExplorer.transform.localPosition = new Vector3(-483f, -89f, 0);
+            //achievementExplorer.transform.localPosition = new Vector3(-483f, -89f, 0);
             achievementExplorer.name = "AchievementUI";
             AchievementHandler.ui = achievementExplorer;
             cc = achievementExplorer.GetComponent<CanvasController>();
             cc.onLoad = false;
             cc.ah = AchievementHandler;
             filler = ab.LoadAsset<GameObject>("filler.prefab");
-            AchievementHandler.filler = filler;
             AchievementHandler.achievement_box = achbox.transform.GetChild(0).gameObject;
             default_icon = achbox.transform.GetChild(0).GetChild(2).GetChild(0).GetComponent<Image>().sprite;
-            AchievementHandler.default_icon = default_icon;
             GameObject.DontDestroyOnLoad(coreGO);
             ModConsole.Log("<color=yellow>Achievement Core loaded succesfully!</color>");
             AddBaseAchievements();
-            AchievementHandler.TriggerAchievement("base", "achcore_using_achcore");
+            AchievementHandler.TriggerAchievement("achcore_using_achcore");
             ab.Unload(false);
             AchievementHandler.StartSecondPass();
         }
@@ -109,7 +109,7 @@ namespace AchievementCore
             {
                 mod_id = "base",
                 name = "Achievement Get!",
-                description = "You're a user of Achievement Core!",
+                description = "You're a user of <color=yellow>Achievement Core</color>!",
                 icon = null,
                 hidden = false,
             });
@@ -127,9 +127,10 @@ namespace AchievementCore
             {
                 cc.GetRandomAchievementKey();
             }
+            if (DEBUG)
             foreach (string s in cc.mod_ids)
             {
-                ModConsole.Print(s);
+                    ModConsole.Print(s);
             }
         }
         private static void LoadAchievements()
