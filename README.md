@@ -20,7 +20,7 @@ After you do that, navigate to the **Mod_OnMenuLoad** function, and add the foll
 
 ![image](https://github.com/Komornikk/AchievementCore/assets/96838205/5e96edcc-fcda-4b3b-be52-f258275b9487)
 
-It doesn't have to be so spaced out, I did that for tutorial purposes.
+It doesn't have to be so spaced out, I did that for tutorial purposes. Also, you can just create a function and call it **Mod_OnMenuLoad**, doesn't matter as long as it's executed in **Mod_OnMenuLoad**
 
 Quite easy, isn't it? Triggering achievements is also really easy! all you have to do is put this line anywhere you want to trigger the achievement!
 
