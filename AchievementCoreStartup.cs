@@ -113,6 +113,7 @@ namespace AchievementCore
                 icon = null,
                 hidden = false,
             });
+            /*
             AchievementIDHolder.achievements.Add("unique_achievement_id", new AchievementIDHolder.AchievementData
             {
                 mod_id = "your_mod_id", // you can just put your mod name here
@@ -121,6 +122,7 @@ namespace AchievementCore
                 icon = null, // your custom icon; leave at null if you want to use the default icon
                 hidden = false, // set to true if you want to reveal your achievement's content after getting it
             });
+            */
         }
         public static IEnumerator SecondPassMenu()
         {
