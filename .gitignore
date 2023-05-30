@@ -9,7 +9,7 @@
 *.user
 *.userosscache
 *.sln.docstates
-wiki_images/
+#wiki_images/
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
