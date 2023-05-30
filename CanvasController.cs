@@ -55,7 +55,7 @@ namespace AchievementCore
             ah.GenerateAchievementList(nextAchievementKey);
             mod_text.text = nextAchievementKey.ToUpper();
         }
-        public void GetRandomAchievementKey()
+        public void GenerateBaseAchievementKey()
         {
             string nextAchievementKey = mod_ids.ToList()[mod_ids.ToList().IndexOf("base")];
             currentText = nextAchievementKey;
@@ -70,7 +70,8 @@ namespace AchievementCore
         private void Update()
         {
             if (!onLoad) disableUI.SetActive(!console.activeSelf);
-            if (onLoad) disableUI.SetActive(options_menu.activeInHierarchy);
+            else if (onLoad && !console.activeSelf) disableUI.SetActive(options_menu.activeInHierarchy);
+            else if (onLoad && console.activeSelf)disableUI.SetActive(!console.activeSelf);
         }
     }
 }

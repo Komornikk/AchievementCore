@@ -113,6 +113,14 @@ namespace AchievementCore
                 icon = null,
                 hidden = false,
             });
+            AchievementIDHolder.achievements.Add("unique_achievement_id", new AchievementIDHolder.AchievementData
+            {
+                mod_id = "your_mod_id", // you can just put your mod name here
+                name = "cool achievement name",
+                description = "awesome achievement description",
+                icon = null, // your custom icon; leave at null if you want to use the default icon
+                hidden = false, // set to true if you want to reveal your achievement's content after getting it
+            });
         }
         public static IEnumerator SecondPassMenu()
         {
@@ -123,14 +131,11 @@ namespace AchievementCore
             {
                 if (!cc.mod_ids.Contains(s)) cc.mod_ids.Add(AchievementIDHolder.achievements[s].mod_id);
             }
-            if (cc.mod_text.text == "NULLNULLNULL")
-            {
-                cc.GetRandomAchievementKey();
-            }
+            cc.GenerateBaseAchievementKey();
             if (DEBUG)
             foreach (string s in cc.mod_ids)
             {
-                    ModConsole.Print(s);
+                ModConsole.Print(s);
             }
         }
         private static void LoadAchievements()
