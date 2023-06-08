@@ -14,12 +14,12 @@ namespace AchievementCore
         public override string Version => "0.9.0";
         public override string Description => "Achievement system for all your mods!";
         public static bool DEBUG = false;
-        private static GameObject canvas, achbox, coreGO, achievementExplorer, filler, box_prefab;
-        private static AssetBundle ab;
-        private static AchievementHandler AchievementHandler;
-        private static CanvasController cc;
-        static Sprite default_icon;
-        private static readonly string saveFile = Application.persistentDataPath + "\\Achievements.dat";
+        protected private static GameObject canvas, achbox, coreGO, achievementExplorer, filler, box_prefab;
+        protected private static AssetBundle ab;
+        protected private static AchievementHandler AchievementHandler;
+        protected private static CanvasController cc;
+        protected static Sprite default_icon;
+        protected private static readonly string saveFile = Application.persistentDataPath + "\\Achievements.dat";
 
         public override void ModSetup()
         {
@@ -73,7 +73,6 @@ namespace AchievementCore
             AchievementIDHolder.achievements.Clear();
             ConsoleCommand.Add(new DebugController());
             ab = LoadAssets.LoadBundle("AchievementCore.Assets.achcore.unity3d");
-            //coreGO = new GameObject("AchievementCore");
             coreGO = GameObject.Instantiate(ab.LoadAsset<GameObject>("coreGO.prefab"));
             coreGO.name = "AchievementCore";
             AchievementHandler = coreGO.GetComponent<AchievementHandler>();
@@ -87,7 +86,6 @@ namespace AchievementCore
             achbox.name = "AchievementBoxHolder";
             achievementExplorer = GameObject.Instantiate(ab.LoadAsset<GameObject>("AchievementUI.prefab"));
             achievementExplorer.transform.SetParent(canvas.transform);
-            //achievementExplorer.transform.localPosition = new Vector3(-483f, -89f, 0);
             achievementExplorer.name = "AchievementUI";
             AchievementHandler.ui = achievementExplorer;
             cc = achievementExplorer.GetComponent<CanvasController>();
@@ -139,6 +137,21 @@ namespace AchievementCore
             {
                 ModConsole.Print(s);
             }
+            /*
+            foreach (string s in AchievementIDHolder.achievements.Keys)
+            {
+                AchievementIDHolder.AchievementData achievementData = AchievementIDHolder.achievements[s];
+
+                AchievementIDHolder.achievements.Add($"{achievementData.mod_id}_completion", new AchievementIDHolder.AchievementData
+                {
+                    mod_id = achievementData.mod_id,
+                    name = "ACHIEVEMENT COMPLETION",
+                    description = "You've completed ",
+                    icon = null,
+                    hidden = false,
+                });
+            }
+            */
         }
         private static void LoadAchievements()
         {

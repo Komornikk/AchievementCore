@@ -61,7 +61,7 @@ namespace AchievementCore
         {
             if (playing)
             {
-                AddToQueue(GetIDAchievement(ad)); // get the achievement ID based on this 
+                AddToQueue(GetIDAchievement(ad)); 
                 StopCoroutine(TriggerAchievementBox(ad));
             }
             playing = true;
@@ -107,7 +107,7 @@ namespace AchievementCore
                 else if (hidden && locked)
                 {
                     inst.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = "hidden achievement".ToUpper();
-                    inst.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = "content will reveal after unlocking the achievement".ToUpper();
+                    inst.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = "content will be revealed after unlocking the achievement".ToUpper();
                     inst.transform.GetChild(2).GetChild(0).gameObject.SetActive(false);
                     inst.transform.GetChild(2).GetChild(2).gameObject.SetActive(true);
                     return;
@@ -127,7 +127,6 @@ namespace AchievementCore
             {
                 GameObject.Destroy(child.gameObject);
             }
-
             //generate unlocked
             foreach (string id in AchievementIDHolder.unlocked_achievements)
             {
