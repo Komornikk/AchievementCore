@@ -97,7 +97,7 @@ namespace AchievementCore
             GameObject.DontDestroyOnLoad(coreGO);
             ModConsole.Log("<color=yellow>Achievement Core loaded succesfully!</color>");
             AddBaseAchievements();
-            AchievementHandler.TriggerAchievement("achcore_using_achcore");
+            AchievementHandler.TriggerAchievement("achcore_using_achcore", true);
             ab.Unload(false);
             AchievementHandler.StartSecondPass();
         }
@@ -137,21 +137,6 @@ namespace AchievementCore
             {
                 ModConsole.Print(s);
             }
-            /*
-            foreach (string s in AchievementIDHolder.achievements.Keys)
-            {
-                AchievementIDHolder.AchievementData achievementData = AchievementIDHolder.achievements[s];
-
-                AchievementIDHolder.achievements.Add($"{achievementData.mod_id}_completion", new AchievementIDHolder.AchievementData
-                {
-                    mod_id = achievementData.mod_id,
-                    name = "ACHIEVEMENT COMPLETION",
-                    description = "You've completed ",
-                    icon = null,
-                    hidden = false,
-                });
-            }
-            */
         }
         private static void LoadAchievements()
         {

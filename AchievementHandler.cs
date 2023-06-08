@@ -7,7 +7,7 @@ namespace AchievementCore
 {
     public class AchievementHandler : MonoBehaviour
     {
-        [SerializeField] private GameObject box_prefab, filler;
+        [SerializeField] private GameObject box_prefab, filler, progress_bar;
         public GameObject achievement_box, ui;
         [SerializeField] private Sprite default_icon;
         private Text header, description_text;
@@ -25,6 +25,7 @@ namespace AchievementCore
             header = achievement_box.transform.GetChild(0).GetChild(0).GetComponent<Text>();
             description_text = achievement_box.transform.GetChild(1).GetChild(0).GetComponent<Text>();
             Icon = achievement_box.transform.GetChild(2).GetChild(0).GetComponent<Image>();
+            progress_bar = ui.transform.GetChild(0).GetChild(1).GetChild(3).gameObject;
             anim = achievement_box.GetComponent<Animation>();
         }
         public void TriggerAchievement(string achievement_id)
@@ -38,6 +39,20 @@ namespace AchievementCore
                 //MSCLoader.ModConsole.Print($"is icon null?: {ad.icon == null}");
                 StartCoroutine(TriggerAchievementBox(ad));
                 return;
+            }
+        }
+        public void TriggerAchievement(string achievement_id, bool silent)
+        {
+            if (!silent) TriggerAchievement(achievement_id);
+            else
+            {
+                if ((AchievementIDHolder.achievements.ContainsKey(achievement_id)))
+                {
+                    AchievementIDHolder.AchievementData ad = AchievementIDHolder.achievements[achievement_id];
+                    if (AchievementIDHolder.unlocked_achievements.Contains(achievement_id)) return;
+                    AchievementIDHolder.unlocked_achievements.Add(achievement_id);
+                    AchievementIDHolder.locked_achievements.Remove(achievement_id);
+                }
             }
         }
         private void AddToQueue(string ID)
@@ -107,7 +122,7 @@ namespace AchievementCore
                 else if (hidden && locked)
                 {
                     inst.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = "hidden achievement".ToUpper();
-                    inst.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = "content will be revealed after unlocking the achievement".ToUpper();
+                    inst.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = "content will be revealed after unlocking the achievement.".ToUpper();
                     inst.transform.GetChild(2).GetChild(0).gameObject.SetActive(false);
                     inst.transform.GetChild(2).GetChild(2).gameObject.SetActive(true);
                     return;
@@ -127,6 +142,30 @@ namespace AchievementCore
             {
                 GameObject.Destroy(child.gameObject);
             }
+            //generate progress bar
+            float unlockedCount = 0;
+            float lockedHiddenCount = 0;
+            foreach (string achievementId in AchievementIDHolder.achievements.Keys)
+            {
+                AchievementIDHolder.AchievementData data = AchievementIDHolder.achievements[achievementId];
+                if (data.mod_id == mod_id)
+                {
+                    if (AchievementIDHolder.unlocked_achievements.Contains(achievementId))
+                    {
+                        unlockedCount++;
+                    }
+                    else if (AchievementIDHolder.locked_achievements.Contains(achievementId) || data.hidden)
+                    {
+                        lockedHiddenCount++;
+                    }
+                }
+            }
+            float percentage = unlockedCount / (unlockedCount + lockedHiddenCount);
+            MSCLoader.ModConsole.Print(percentage.ToString());
+            progress_bar.transform.GetChild(4).GetChild(0).GetComponent<Image>().fillAmount = percentage;
+            progress_bar.transform.GetChild(4).GetChild(1).GetComponent<Text>().text = percentage == 1f ? "100%" : Mathf.Round(percentage * 100).ToString("0\\%");
+            progress_bar.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = $"YOU'VE COMPLETED <color=yellow>{unlockedCount}</color> OUT OF <color=yellow>{unlockedCount+lockedHiddenCount}</color>!";
+
             //generate unlocked
             foreach (string id in AchievementIDHolder.unlocked_achievements)
             {
