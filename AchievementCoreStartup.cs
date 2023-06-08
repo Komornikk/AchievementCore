@@ -11,7 +11,7 @@ namespace AchievementCore
         public override string ID => "AchievementCore";
         public override string Name => "Achievement Core";
         public override string Author => "komornik";
-        public override string Version => "0.9.0";
+        public override string Version => "0.9.1";
         public override string Description => "Achievement system for all your mods!";
         public static bool DEBUG = false;
         protected private static GameObject canvas, achbox, coreGO, achievementExplorer, filler, box_prefab;
