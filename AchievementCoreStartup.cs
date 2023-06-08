@@ -34,6 +34,13 @@ namespace AchievementCore
             {
                 PrintAllIDs();
             }
+            if (Input.GetKeyDown(KeyCode.H) && DEBUG)
+            {
+                foreach (string s in cc.mod_ids)
+                {
+                    ModConsole.Print(s);
+                }
+            }
         }
         void PrintAllIDs()
         {
@@ -97,7 +104,6 @@ namespace AchievementCore
             GameObject.DontDestroyOnLoad(coreGO);
             ModConsole.Log("<color=yellow>Achievement Core loaded succesfully!</color>");
             AddBaseAchievements();
-            AchievementHandler.TriggerAchievement("achcore_using_achcore", true);
             ab.Unload(false);
             AchievementHandler.StartSecondPass();
         }
@@ -131,12 +137,8 @@ namespace AchievementCore
             {
                 if (!cc.mod_ids.Contains(s)) cc.mod_ids.Add(AchievementIDHolder.achievements[s].mod_id);
             }
+            AchievementHandler.TriggerAchievement("achcore_using_achcore", true);
             cc.GenerateBaseAchievementKey();
-            if (DEBUG)
-            foreach (string s in cc.mod_ids)
-            {
-                ModConsole.Print(s);
-            }
         }
         private static void LoadAchievements()
         {
@@ -153,6 +155,14 @@ namespace AchievementCore
                         AchievementIDHolder.unlocked_achievements.Add(id);
                         AchievementIDHolder.locked_achievements.Remove(id);
                     }
+                }
+            }
+            else
+            {
+                AchievementIDHolder.unlocked_achievements.Clear();
+                foreach (string id in AchievementIDHolder.achievements.Keys)
+                {
+                    AchievementIDHolder.locked_achievements.Add(id);
                 }
             }
         }
