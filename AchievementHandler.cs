@@ -47,7 +47,6 @@ namespace AchievementCore
             {
                 if ((AchievementIDHolder.achievements.ContainsKey(achievement_id)))
                 {
-                    AchievementIDHolder.AchievementData ad = AchievementIDHolder.achievements[achievement_id];
                     if (AchievementIDHolder.unlocked_achievements.Contains(achievement_id)) return;
                     AchievementIDHolder.unlocked_achievements.Add(achievement_id);
                     AchievementIDHolder.locked_achievements.Remove(achievement_id);
@@ -81,7 +80,7 @@ namespace AchievementCore
             playing = true;
             header.text = ad.name.ToUpper();
             description_text.text = ad.description.ToUpper();
-            Icon.sprite = ad.icon == null ? default_icon : ad.icon;
+            Icon.sprite = ad.icon ?? default_icon;
             anim.Play("in");
             yield return new WaitForSeconds(5f);
             anim.Play("out");
@@ -104,104 +103,108 @@ namespace AchievementCore
         }
         void GenerateBox(string id, bool locked, bool hidden)
         {
-            if (!ui.transform.GetChild(0).GetChild(1).GetChild(1).GetChild(0).Find($"Achievement_{id}"))
+            Transform boxParent = ui.transform.GetChild(0).GetChild(1).GetChild(1).GetChild(0);
+            Transform existingBox = boxParent.Find($"Achievement_{id}");
+            if (existingBox != null) return;
+
+            AchievementIDHolder.AchievementData achievementData = AchievementIDHolder.achievements[id];
+            GameObject inst = GameObject.Instantiate(box_prefab);
+            inst.transform.SetParent(boxParent);
+            inst.name = $"Achievement_{id}";
+
+            Transform textName = inst.transform.GetChild(0).GetChild(0);
+            Transform textDescription = inst.transform.GetChild(1).GetChild(0);
+            Transform imageIcon = inst.transform.GetChild(2).GetChild(0);
+
+            textName.GetComponent<Text>().text = locked ? "hidden achievement".ToUpper() : achievementData.name.ToUpper();
+            textDescription.GetComponent<Text>().text = locked ? "content will be revealed after unlocking the achievement.".ToUpper() : achievementData.description.ToUpper();
+
+            if (locked && !hidden)
             {
-                AchievementIDHolder.AchievementData achievementData = AchievementIDHolder.achievements[id];
-                GameObject inst = GameObject.Instantiate(box_prefab);
-                inst.transform.SetParent(ui.transform.GetChild(0).GetChild(1).GetChild(1).GetChild(0));
-                inst.name = $"Achievement_{id}";
-                if (locked && !hidden)
+                inst.transform.GetChild(2).GetChild(0).gameObject.SetActive(false);
+                inst.transform.GetChild(2).GetChild(1).gameObject.SetActive(true);
+            }
+            else if (hidden && locked)
+            {
+                inst.transform.GetChild(2).GetChild(0).gameObject.SetActive(false);
+                inst.transform.GetChild(2).GetChild(2).gameObject.SetActive(true);
+            }
+            else
+            {
+                if (achievementData.icon != null)
                 {
-                    inst.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = achievementData.name.ToUpper();
-                    inst.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = achievementData.description.ToUpper();
-                    inst.transform.GetChild(2).GetChild(0).gameObject.SetActive(false);
-                    inst.transform.GetChild(2).GetChild(1).gameObject.SetActive(true);
-                    return;
-                }
-                else if (hidden && locked)
-                {
-                    inst.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = "hidden achievement".ToUpper();
-                    inst.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = "content will be revealed after unlocking the achievement.".ToUpper();
-                    inst.transform.GetChild(2).GetChild(0).gameObject.SetActive(false);
-                    inst.transform.GetChild(2).GetChild(2).gameObject.SetActive(true);
-                    return;
-                }
-                else
-                {
-                    inst.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = achievementData.name.ToUpper();
-                    inst.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = achievementData.description.ToUpper();
-                    if (achievementData.icon != null) inst.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite = achievementData.icon;
+                    imageIcon.GetComponent<Image>().sprite = achievementData.icon;
                 }
             }
         }
         public void GenerateAchievementList(string mod_id)
         {
-            //remove existing boxes
-            foreach (Transform child in ui.transform.GetChild(0).GetChild(1).GetChild(1).GetChild(0))
+            Transform boxParent = ui.transform.GetChild(0).GetChild(1).GetChild(1).GetChild(0);
+
+            // remove existing boxes
+            foreach (Transform child in boxParent)
             {
                 GameObject.Destroy(child.gameObject);
             }
-            //generate progress bar
+
+            // generate progress bar
             float unlockedCount = 0;
             float lockedHiddenCount = 0;
-            foreach (string achievementId in AchievementIDHolder.achievements.Keys)
+            //count how many achievements are unlocked
+            foreach (var pair in AchievementIDHolder.achievements)
             {
-                AchievementIDHolder.AchievementData data = AchievementIDHolder.achievements[achievementId];
+                AchievementIDHolder.AchievementData data = pair.Value;
                 if (data.mod_id == mod_id)
                 {
-                    if (AchievementIDHolder.unlocked_achievements.Contains(achievementId))
+                    if (AchievementIDHolder.unlocked_achievements.Contains(pair.Key))
                     {
                         unlockedCount++;
                     }
-                    else if (AchievementIDHolder.locked_achievements.Contains(achievementId) || data.hidden)
+                    else if (AchievementIDHolder.locked_achievements.Contains(pair.Key) || data.hidden)
                     {
                         lockedHiddenCount++;
                     }
                 }
             }
+            // calculate the percentage and set the progress
             float percentage = unlockedCount / (unlockedCount + lockedHiddenCount);
             MSCLoader.ModConsole.Print(percentage.ToString());
             progress_bar.transform.GetChild(4).GetChild(0).GetComponent<Image>().fillAmount = percentage;
             progress_bar.transform.GetChild(4).GetChild(1).GetComponent<Text>().text = percentage == 1f ? "100%" : Mathf.Round(percentage * 100).ToString("0\\%");
-            progress_bar.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = $"YOU'VE COMPLETED <color=yellow>{unlockedCount}</color> OUT OF <color=yellow>{unlockedCount+lockedHiddenCount}</color>!";
+            progress_bar.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = $"YOU'VE COMPLETED <color=yellow>{unlockedCount}</color> OUT OF <color=yellow>{unlockedCount + lockedHiddenCount}</color>!";
 
-            //generate unlocked
+            // generate unlocked achievements
             foreach (string id in AchievementIDHolder.unlocked_achievements)
             {
-                if (AchievementIDHolder.achievements.TryGetValue(id, out AchievementIDHolder.AchievementData achievementData))
+                if (AchievementIDHolder.achievements.TryGetValue(id, out AchievementIDHolder.AchievementData achievementData) && achievementData.mod_id == mod_id)
                 {
-                    if (achievementData.mod_id == mod_id)
                     GenerateBox(id, false, false);
                 }
             }
 
-            //generate locked
+            // generate locked achievements (excluding hidden)
             foreach (string id in AchievementIDHolder.locked_achievements)
             {
-                if (AchievementIDHolder.achievements.TryGetValue(id, out AchievementIDHolder.AchievementData achievementData) && !achievementData.hidden)
+                if (AchievementIDHolder.achievements.TryGetValue(id, out AchievementIDHolder.AchievementData achievementData) && !achievementData.hidden && achievementData.mod_id == mod_id)
                 {
-                    if (achievementData.mod_id == mod_id)
-                        GenerateBox(id, true, false);
+                    GenerateBox(id, true, false);
                 }
             }
 
-            //generate hidden
-            foreach (string id in AchievementIDHolder.achievements.Keys)
+            // generate hidden achievements (including locked)
+            foreach (KeyValuePair<string, AchievementIDHolder.AchievementData> kvp in AchievementIDHolder.achievements)
             {
-                AchievementIDHolder.AchievementData achievementData = AchievementIDHolder.achievements[id];
-                if (achievementData.hidden && !AchievementIDHolder.locked_achievements.Contains(id))
+                string id = kvp.Key;
+                AchievementIDHolder.AchievementData achievementData = kvp.Value;
+                if (achievementData.hidden && achievementData.mod_id == mod_id)
                 {
-                    if (achievementData.mod_id == mod_id)
-                        GenerateBox(id, false, true);
-                }
-                else if (achievementData.hidden && AchievementIDHolder.locked_achievements.Contains(id))
-                {
-                    if (achievementData.mod_id == mod_id)
-                        GenerateBox(id, true, true);
+                    bool isLocked = AchievementIDHolder.locked_achievements.Contains(id);
+                    GenerateBox(id, isLocked, true);
                 }
             }
-            //add filler box so the last achievement box doesn't get cut in half by the list 
-            GameObject.Instantiate(filler).transform.SetParent(ui.transform.GetChild(0).GetChild(1).GetChild(1).GetChild(0));
+
+            // add filler box so the last achievement box doesn't get cut in half by the list 
+            GameObject.Instantiate(filler).transform.SetParent(boxParent);
         }
     }
 }

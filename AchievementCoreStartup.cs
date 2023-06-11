@@ -11,7 +11,7 @@ namespace AchievementCore
         public override string ID => "AchievementCore";
         public override string Name => "Achievement Core";
         public override string Author => "komornik";
-        public override string Version => "0.9.2";
+        public override string Version => "0.9.3";
         public override string Description => "Achievement system for all your mods!";
         public static bool DEBUG = false;
         protected private static GameObject canvas, achbox, coreGO, achievementExplorer, filler, box_prefab;
@@ -94,9 +94,7 @@ namespace AchievementCore
             achievementExplorer = GameObject.Instantiate(ab.LoadAsset<GameObject>("AchievementUI.prefab"));
             achievementExplorer.transform.SetParent(canvas.transform);
             achievementExplorer.name = "AchievementUI";
-
             AchievementHandler.ui = achievementExplorer;
-
             cc = achievementExplorer.GetComponent<CanvasController>();
             cc.onLoad = false;
             cc.ah = AchievementHandler;
