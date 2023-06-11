@@ -112,12 +112,28 @@ namespace AchievementCore
             inst.transform.SetParent(boxParent);
             inst.name = $"Achievement_{id}";
 
-            Transform textName = inst.transform.GetChild(0).GetChild(0);
-            Transform textDescription = inst.transform.GetChild(1).GetChild(0);
-            Transform imageIcon = inst.transform.GetChild(2).GetChild(0);
+            Text textName = inst.transform.GetChild(0).GetChild(0).GetComponent<Text>();
+            Text textDescription = inst.transform.GetChild(1).GetChild(0).GetComponent<Text>();
+            Image imageIcon = inst.transform.GetChild(2).GetChild(0).GetComponent<Image>();
 
-            textName.GetComponent<Text>().text = locked ? "hidden achievement".ToUpper() : achievementData.name.ToUpper();
-            textDescription.GetComponent<Text>().text = locked ? "content will be revealed after unlocking the achievement.".ToUpper() : achievementData.description.ToUpper();
+            if (locked && !hidden)
+            {
+                textName.text = achievementData.name.ToUpper();
+                textDescription.text = achievementData.description.ToUpper();
+            }
+            else if (hidden && locked)
+            {
+                textName.text = "hidden achievement".ToUpper();
+                textDescription.text = "content will be revealed after unlocking the achievement.".ToUpper();
+                inst.transform.GetChild(2).GetChild(0).gameObject.SetActive(false);
+                inst.transform.GetChild(2).GetChild(2).gameObject.SetActive(true);
+            }
+            else
+            {
+                textName.text = achievementData.name.ToUpper();
+                textDescription.text = achievementData.description.ToUpper();
+                if (achievementData.icon != null) imageIcon.sprite = achievementData.icon;
+            }
 
             if (locked && !hidden)
             {
@@ -191,15 +207,19 @@ namespace AchievementCore
                 }
             }
 
-            // generate hidden achievements (including locked)
-            foreach (KeyValuePair<string, AchievementIDHolder.AchievementData> kvp in AchievementIDHolder.achievements)
+            //generate hidden
+            foreach (string id in AchievementIDHolder.achievements.Keys)
             {
-                string id = kvp.Key;
-                AchievementIDHolder.AchievementData achievementData = kvp.Value;
-                if (achievementData.hidden && achievementData.mod_id == mod_id)
+                AchievementIDHolder.AchievementData achievementData = AchievementIDHolder.achievements[id];
+                if (achievementData.hidden && !AchievementIDHolder.locked_achievements.Contains(id))
                 {
-                    bool isLocked = AchievementIDHolder.locked_achievements.Contains(id);
-                    GenerateBox(id, isLocked, true);
+                    if (achievementData.mod_id == mod_id)
+                        GenerateBox(id, false, true);
+                }
+                else if (achievementData.hidden && AchievementIDHolder.locked_achievements.Contains(id))
+                {
+                    if (achievementData.mod_id == mod_id)
+                        GenerateBox(id, true, true);
                 }
             }
 
