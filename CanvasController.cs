@@ -18,7 +18,7 @@ namespace AchievementCore
 
         public void Start()
         {
-            ui = transform.GetChild(0).GetChild(1).gameObject;
+            //ui = transform.GetChild(0).GetChild(1).gameObject;
             console = FindObjectsOfType<MSCLoader.ConsoleView>()[0].transform.GetChild(0).gameObject;
             disableUI = transform.GetChild(0).gameObject;
         }

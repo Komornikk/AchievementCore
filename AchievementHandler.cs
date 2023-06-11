@@ -19,9 +19,8 @@ namespace AchievementCore
         {
             StartCoroutine(AchievementCore.SecondPassMenu());
         }
-        private void Start()
+        public void Start()
         {
-            //achievement_box = achievement_box.transform.GetChild(0).gameObject;
             header = achievement_box.transform.GetChild(0).GetChild(0).GetComponent<Text>();
             description_text = achievement_box.transform.GetChild(1).GetChild(0).GetComponent<Text>();
             Icon = achievement_box.transform.GetChild(2).GetChild(0).GetComponent<Image>();

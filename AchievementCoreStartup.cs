@@ -11,7 +11,7 @@ namespace AchievementCore
         public override string ID => "AchievementCore";
         public override string Name => "Achievement Core";
         public override string Author => "komornik";
-        public override string Version => "0.9.1";
+        public override string Version => "0.9.2";
         public override string Description => "Achievement system for all your mods!";
         public static bool DEBUG = false;
         protected private static GameObject canvas, achbox, coreGO, achievementExplorer, filler, box_prefab;
@@ -94,7 +94,9 @@ namespace AchievementCore
             achievementExplorer = GameObject.Instantiate(ab.LoadAsset<GameObject>("AchievementUI.prefab"));
             achievementExplorer.transform.SetParent(canvas.transform);
             achievementExplorer.name = "AchievementUI";
+
             AchievementHandler.ui = achievementExplorer;
+
             cc = achievementExplorer.GetComponent<CanvasController>();
             cc.onLoad = false;
             cc.ah = AchievementHandler;
@@ -104,6 +106,7 @@ namespace AchievementCore
             GameObject.DontDestroyOnLoad(coreGO);
             ModConsole.Log("<color=yellow>Achievement Core loaded succesfully!</color>");
             AddBaseAchievements();
+            AchievementHandler.TriggerAchievement("achcore_using_achcore", true);
             ab.Unload(false);
             AchievementHandler.StartSecondPass();
         }
@@ -138,6 +141,8 @@ namespace AchievementCore
                 if (!cc.mod_ids.Contains(s)) cc.mod_ids.Add(AchievementIDHolder.achievements[s].mod_id);
             }
             AchievementHandler.TriggerAchievement("achcore_using_achcore", true);
+            //AchievementHandler.SecondPass();
+            //cc.SecondPass();
             cc.GenerateBaseAchievementKey();
         }
         private static void LoadAchievements()
