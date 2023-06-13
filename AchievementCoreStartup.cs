@@ -9,7 +9,7 @@ public class AchievementCore : Mod
     public override string ID => "AchievementCore";
     public override string Name => "Achievement Core";
     public override string Author => "komornik";
-    public override string Version => "0.9.4";
+    public override string Version => "0.9.5";
     public override string Description => "Achievement system for all your mods!";
     public static bool DEBUG = false;
     protected private static GameObject canvas, achbox, coreGO, achievementExplorer, filler, box_prefab;
@@ -37,6 +37,21 @@ public class AchievementCore : Mod
             foreach (string s in cc.mod_ids)
             {
                 ModConsole.Print(s);
+            }
+        }
+    }
+    void GenerateALotOfAchievementsAndMods()
+    {
+        int mods = 30;
+        int achievements = 100;
+
+        for (int modIndex = 0; modIndex < mods; modIndex++)
+        {
+            string modId = $"mod_{modIndex}";
+            string modName = $"Mod {modIndex}";
+            for (int achievementIndex = 0; achievementIndex < achievements; achievementIndex++)
+            {
+                Achievement newAchievement = new Achievement($"{modId}_achievement_{achievementIndex}", modName, $"Achievement {achievementIndex}", $"Description of Achievement {achievementIndex}");
             }
         }
     }
@@ -102,6 +117,7 @@ public class AchievementCore : Mod
         GameObject.DontDestroyOnLoad(coreGO);
         ModConsole.Log("<color=yellow>Achievement Core loaded succesfully!</color>");
         AddBaseAchievements();
+        //GenerateALotOfAchievementsAndMods();
         AchievementHandler.TriggerAchievement("achcore_using_achcore", true);
         ab.Unload(false);
         AchievementHandler.StartSecondPass();
