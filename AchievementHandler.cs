@@ -29,7 +29,7 @@ public class AchievementHandler : MonoBehaviour
     {
         if (AchievementIDHolder.achievements.ContainsKey(achievement_id))
         {
-            AchievementIDHolder.AchievementData ad = AchievementIDHolder.achievements[achievement_id];
+            AchievementData ad = AchievementIDHolder.achievements[achievement_id];
             if (AchievementIDHolder.unlocked_achievements.Contains(achievement_id)) return;
             AchievementIDHolder.unlocked_achievements.Add(achievement_id);
             AchievementIDHolder.locked_achievements.Remove(achievement_id);
@@ -68,7 +68,7 @@ public class AchievementHandler : MonoBehaviour
     {
         queueID.Remove(queueID[0]);
     }
-    private IEnumerator TriggerAchievementBox(AchievementIDHolder.AchievementData ad)
+    private IEnumerator TriggerAchievementBox(AchievementData ad)
     {
         if (playing)
         {
@@ -86,7 +86,7 @@ public class AchievementHandler : MonoBehaviour
         playing = false;
         NextAchievement();
     }
-    string GetIDAchievement(AchievementIDHolder.AchievementData ad)
+    string GetIDAchievement(AchievementData ad)
     {
         string id = null;
         foreach (var pair in AchievementIDHolder.achievements)
@@ -105,7 +105,7 @@ public class AchievementHandler : MonoBehaviour
         Transform existingBox = boxParent.Find($"Achievement_{id}");
         if (existingBox != null) return;
 
-        AchievementIDHolder.AchievementData achievementData = AchievementIDHolder.achievements[id];
+        AchievementData achievementData = AchievementIDHolder.achievements[id];
         GameObject inst = GameObject.Instantiate(box_prefab);
         inst.transform.SetParent(boxParent);
         inst.name = $"Achievement_{id}";
@@ -167,7 +167,7 @@ public class AchievementHandler : MonoBehaviour
         //count how many achievements are unlocked
         foreach (var pair in AchievementIDHolder.achievements)
         {
-            AchievementIDHolder.AchievementData data = pair.Value;
+            AchievementData data = pair.Value;
             if (data.mod_id == mod_id)
             {
                 if (AchievementIDHolder.unlocked_achievements.Contains(pair.Key))
@@ -190,7 +190,7 @@ public class AchievementHandler : MonoBehaviour
         // generate unlocked achievements
         foreach (string id in AchievementIDHolder.unlocked_achievements)
         {
-            if (AchievementIDHolder.achievements.TryGetValue(id, out AchievementIDHolder.AchievementData achievementData) && achievementData.mod_id == mod_id)
+            if (AchievementIDHolder.achievements.TryGetValue(id, out AchievementData achievementData) && achievementData.mod_id == mod_id)
             {
                 GenerateBox(id, false, false);
             }
@@ -199,7 +199,7 @@ public class AchievementHandler : MonoBehaviour
         // generate locked achievements (excluding hidden)
         foreach (string id in AchievementIDHolder.locked_achievements)
         {
-            if (AchievementIDHolder.achievements.TryGetValue(id, out AchievementIDHolder.AchievementData achievementData) && !achievementData.hidden && achievementData.mod_id == mod_id)
+            if (AchievementIDHolder.achievements.TryGetValue(id, out AchievementData achievementData) && !achievementData.hidden && achievementData.mod_id == mod_id)
             {
                 GenerateBox(id, true, false);
             }
@@ -208,7 +208,7 @@ public class AchievementHandler : MonoBehaviour
         //generate hidden
         foreach (string id in AchievementIDHolder.achievements.Keys)
         {
-            AchievementIDHolder.AchievementData achievementData = AchievementIDHolder.achievements[id];
+            AchievementData achievementData = AchievementIDHolder.achievements[id];
             if (achievementData.hidden && !AchievementIDHolder.locked_achievements.Contains(id))
             {
                 if (achievementData.mod_id == mod_id)

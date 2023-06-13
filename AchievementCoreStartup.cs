@@ -9,7 +9,7 @@ public class AchievementCore : Mod
     public override string ID => "AchievementCore";
     public override string Name => "Achievement Core";
     public override string Author => "komornik";
-    public override string Version => "0.9.3";
+    public override string Version => "0.9.4";
     public override string Description => "Achievement system for all your mods!";
     public static bool DEBUG = false;
     protected private static GameObject canvas, achbox, coreGO, achievementExplorer, filler, box_prefab;
@@ -108,7 +108,9 @@ public class AchievementCore : Mod
     }
     void AddBaseAchievements()
     {
-        AchievementIDHolder.achievements.Add("achcore_using_achcore", new AchievementIDHolder.AchievementData
+        Achievement using_achcore = new Achievement("achcore_using_achcore", "base", "Achievement Get!", "You're a user of <color=yellow>Achievement Core</color>!", null, false);
+        /*
+        AchievementIDHolder.achievements.Add("achcore_using_achcore", new AchievementData
         {
             mod_id = "base",
             name = "Achievement Get!",
@@ -116,6 +118,7 @@ public class AchievementCore : Mod
             icon = null,
             hidden = false,
         });
+        */
         /*
         AchievementIDHolder.achievements.Add("unique_achievement_id", new AchievementIDHolder.AchievementData
         {
