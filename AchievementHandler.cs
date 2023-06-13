@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-public class AchievementHandler : MonoBehaviour
+class AchievementHandler : MonoBehaviour
 {
     [SerializeField] private GameObject box_prefab, filler, progress_bar;
     public GameObject achievement_box, ui;

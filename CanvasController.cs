@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-public class CanvasController : MonoBehaviour
+class CanvasController : MonoBehaviour
 {
 
     private GameObject disableUI, options_menu, console;
