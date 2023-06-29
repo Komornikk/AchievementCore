@@ -182,7 +182,7 @@ class AchievementHandler : MonoBehaviour
         }
         // calculate the percentage and set the progress
         float percentage = unlockedCount / (unlockedCount + lockedHiddenCount);
-        MSCLoader.ModConsole.Print(percentage.ToString());
+        if (AchievementCore.DEBUG) MSCLoader.ModConsole.Print(percentage.ToString());
         progress_bar.transform.GetChild(4).GetChild(0).GetComponent<Image>().fillAmount = percentage;
         progress_bar.transform.GetChild(4).GetChild(1).GetComponent<Text>().text = percentage == 1f ? "100%" : Mathf.Round(percentage * 100).ToString("0\\%");
         progress_bar.transform.GetChild(1).GetChild(0).GetComponent<Text>().text = $"YOU'VE COMPLETED <color=yellow>{unlockedCount}</color> OUT OF <color=yellow>{unlockedCount + lockedHiddenCount}</color>!";

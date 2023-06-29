@@ -9,7 +9,7 @@ public class AchievementCore : Mod
     public override string ID => "AchievementCore";
     public override string Name => "Achievement Core";
     public override string Author => "komornik";
-    public override string Version => "0.9.5";
+    public override string Version => "1.0.0";
     public override string Description => "Achievement system for all your mods!";
     public static bool DEBUG = false;
     protected private static GameObject canvas, achbox, coreGO, achievementExplorer, filler, box_prefab;
@@ -117,34 +117,19 @@ public class AchievementCore : Mod
         GameObject.DontDestroyOnLoad(coreGO);
         ModConsole.Log("<color=yellow>Achievement Core loaded succesfully!</color>");
         AddBaseAchievements();
-        //GenerateALotOfAchievementsAndMods();
+        //AddVanillaAchievements();
         AchievementHandler.TriggerAchievement("achcore_using_achcore", true);
         ab.Unload(false);
         AchievementHandler.StartSecondPass();
+        GenerateALotOfAchievementsAndMods();
+    }
+    void AddVanillaAchievements()
+    {
+        // nothing here for now
     }
     void AddBaseAchievements()
     {
         Achievement using_achcore = new Achievement("achcore_using_achcore", "base", "Achievement Get!", "You're a user of <color=yellow>Achievement Core</color>!", null, false);
-        /*
-        AchievementIDHolder.achievements.Add("achcore_using_achcore", new AchievementData
-        {
-            mod_id = "base",
-            name = "Achievement Get!",
-            description = "You're a user of <color=yellow>Achievement Core</color>!",
-            icon = null,
-            hidden = false,
-        });
-        */
-        /*
-        AchievementIDHolder.achievements.Add("unique_achievement_id", new AchievementIDHolder.AchievementData
-        {
-            mod_id = "your_mod_id", // you can just put your mod name here
-            name = "cool achievement name",
-            description = "awesome achievement description",
-            icon = null, // your custom icon; leave at null if you want to use the default icon
-            hidden = false, // set to true if you want to reveal your achievement's content after getting it
-        });
-        */
     }
     public static IEnumerator SecondPassMenu()
     {

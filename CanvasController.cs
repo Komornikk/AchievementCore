@@ -6,6 +6,7 @@ class CanvasController : MonoBehaviour
 {
 
     private GameObject disableUI, options_menu, console;
+    public Scrollbar slider;
     public AchievementHandler ah;
     public GameObject ui;
     public Text mod_text;
@@ -51,6 +52,8 @@ class CanvasController : MonoBehaviour
         currentText = nextAchievementKey;
         ah.GenerateAchievementList(nextAchievementKey);
         mod_text.text = nextAchievementKey.ToUpper();
+        slider.value = 1f;
+        //MasterAudio.PlaySound("bolt_screw", 0.4f);
     }
     public void GenerateBaseAchievementKey()
     {
