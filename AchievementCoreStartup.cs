@@ -121,7 +121,7 @@ public class AchievementCore : Mod
         AchievementHandler.TriggerAchievement("achcore_using_achcore", true);
         ab.Unload(false);
         AchievementHandler.StartSecondPass();
-        GenerateALotOfAchievementsAndMods();
+        //GenerateALotOfAchievementsAndMods();
     }
     void AddVanillaAchievements()
     {
