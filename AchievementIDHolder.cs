@@ -9,59 +9,38 @@ public struct AchievementData
     public bool hidden;
 }
 
-public class TriggerAchievement
+public static class Achievement
 {
-    public TriggerAchievement(string achievement_id)
+    public static void CreateAchievement(string achievementID, string mod_name, string name, string description, Sprite icon, bool hidden)
+    {
+        AchievementIDHolder.achievements.Add(achievementID, new AchievementData
+        {
+            mod_id = mod_name,
+            name = name,
+            description = description,
+            icon = icon,
+            hidden = hidden,
+        });
+    }
+    public static void CreateAchievement(string achievementID, string mod_name, string name, string description, Sprite icon)
+    {
+        CreateAchievement(achievementID, mod_name, name, description, icon, false);
+    }
+    public static void CreateAchievement(string achievementID, string mod_name, string name, string description, bool hidden)
+    {
+        CreateAchievement(achievementID, mod_name, name, description, null, hidden);
+    }
+    public static void CreateAchievement(string achievementID, string mod_name, string name, string description)
+    {
+        CreateAchievement(achievementID, mod_name, name, description, null, false);
+    }
+    public static void TriggerAchievement(string achievement_id)
     {
         AchievementIDHolder.AchievementHandler.TriggerAchievement(achievement_id);
     }
-}
-
-public class Achievement
-{
-    public Achievement(string achievementID, string mod_name, string name, string description, Sprite icon, bool hidden)
+    public static bool IsAchievementUnlocked(string achievement_id)
     {
-        AchievementIDHolder.achievements.Add(achievementID, new AchievementData
-        {
-            mod_id = mod_name,
-            name = name,
-            description = description,
-            icon = icon,
-            hidden = hidden,
-        });
-    }
-    public Achievement(string achievementID, string mod_name, string name, string description, Sprite icon)
-    {
-        AchievementIDHolder.achievements.Add(achievementID, new AchievementData
-        {
-            mod_id = mod_name,
-            name = name,
-            description = description,
-            icon = icon,
-            hidden = false,
-        });
-    }
-    public Achievement(string achievementID, string mod_name, string name, string description, bool hidden)
-    {
-        AchievementIDHolder.achievements.Add(achievementID, new AchievementData
-        {
-            mod_id = mod_name,
-            name = name,
-            description = description,
-            icon = null,
-            hidden = hidden,
-        });
-    }
-    public Achievement(string achievementID, string mod_name, string name, string description)
-    {
-        AchievementIDHolder.achievements.Add(achievementID, new AchievementData
-        {
-            mod_id = mod_name,
-            name = name,
-            description = description,
-            icon = null,
-            hidden = false,
-        });
+        return AchievementIDHolder.unlocked_achievements.Contains(achievement_id);
     }
 }
 class AchievementIDHolder
