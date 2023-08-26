@@ -27,7 +27,11 @@ class AchievementHandler : MonoBehaviour
     }
     public void TriggerAchievement(string achievement_id)
     {
-        if (AchievementIDHolder.achievements.ContainsKey(achievement_id))
+        if (AchievementCore.scb.GetValue())
+        {
+            TriggerAchievement(achievement_id, true);
+        }
+        else if (AchievementIDHolder.achievements.ContainsKey(achievement_id))
         {
             AchievementData ad = AchievementIDHolder.achievements[achievement_id];
             if (AchievementIDHolder.unlocked_achievements.Contains(achievement_id)) return;

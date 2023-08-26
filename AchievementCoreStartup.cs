@@ -25,9 +25,16 @@ public class AchievementCore : Mod
         SetupFunction(Setup.OnLoad, Mod_OnLoad);
         SetupFunction(Setup.OnSave, Mod_OnSave);
         SetupFunction(Setup.Update, Mod_Update);
+        SetupFunction(Setup.ModSettings, Mod_Settings);
+    }
+    public static SettingsCheckBox scb;
+    public void Mod_Settings()
+    {
+        scb = Settings.AddCheckBox(this, "disableAchievementPopups", "DISABLE ACHIEVEMENT POPUPS", false);
     }
     public void Mod_Update()
     {
+        achbox.SetActive(!scb.GetValue());
         if (Input.GetKeyDown(KeyCode.G) && DEBUG)
         {
             PrintAllIDs();
