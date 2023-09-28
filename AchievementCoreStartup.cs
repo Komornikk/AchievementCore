@@ -9,7 +9,7 @@ public class AchievementCore : Mod
     public override string ID => "AchievementCore";
     public override string Name => "Achievement Core";
     public override string Author => "komornik";
-    public override string Version => "1.0.3";
+    public override string Version => "1.0.4";
     public override string Description => "Achievement system for all your mods!";
     public static bool DEBUG = false;
     protected private static GameObject canvas, achbox, coreGO, achievementExplorer, filler, box_prefab;
@@ -92,44 +92,36 @@ public class AchievementCore : Mod
     }
     public void Mod_OnLoad()
     {
-        achievementExplorer.GetComponent<CanvasController>().FindOptionsMenu();
-        achievementExplorer.GetComponent<CanvasController>().onLoad = true;
-        achievementExplorer.GetComponent<CanvasController>().ui.SetActive(false);
+        AchievementHandler.ui.GetComponent<CanvasController>().FindOptionsMenu();
+        AchievementHandler.ui.GetComponent<CanvasController>().onLoad = true;
+        AchievementHandler.ui.GetComponent<CanvasController>().ui.SetActive(false);
     }
+    //public static void SetResolution(1280, 540, true);
     public void Mod_OnMenuLoad()
     {
         AchievementIDHolder.achievements.Clear();
         ConsoleCommand.Add(new DebugController());
         ab = LoadAssets.LoadBundle("AchievementCore.Assets.achcore.unity3d");
-        coreGO = GameObject.Instantiate(ab.LoadAsset<GameObject>("coreGO.prefab"));
-        coreGO.name = "AchievementCore";
+        canvas = GameObject.Instantiate(ab.LoadAsset<GameObject>("AchievementCoreCanvas.prefab"));
+        coreGO = canvas.transform.Find("coreGO").gameObject;
         AchievementHandler = coreGO.GetComponent<AchievementHandler>();
         AchievementIDHolder.AchievementHandler = AchievementHandler;
-        canvas = ModUI.CreateCanvas("AchievementCoreUI", true);
+        canvas.name = "AchievementCoreCanvas";
         box_prefab = ab.LoadAsset<GameObject>("AchievementBox.prefab");
-        achbox = GameObject.Instantiate(ab.LoadAsset<GameObject>("achbox.prefab"));
-        achbox.transform.SetParent(canvas.transform);
-        achbox.transform.localScale = Vector3.one;
-        achbox.transform.localPosition = new Vector3(-1066f, 361f, 0f);
+        achbox = canvas.transform.Find("achbox").gameObject;
         achbox.name = "AchievementBoxHolder";
-        achievementExplorer = GameObject.Instantiate(ab.LoadAsset<GameObject>("AchievementUI.prefab"));
-        achievementExplorer.transform.SetParent(canvas.transform);
-        achievementExplorer.name = "AchievementUI";
-        AchievementHandler.ui = achievementExplorer;
-        cc = achievementExplorer.GetComponent<CanvasController>();
+        AchievementHandler.ui = canvas.transform.Find("AchievementUI").gameObject;
+        cc = AchievementHandler.ui.GetComponent<CanvasController>();
         cc.onLoad = false;
-        cc.ah = AchievementHandler;
         filler = ab.LoadAsset<GameObject>("filler.prefab");
         AchievementHandler.achievement_box = achbox.transform.GetChild(0).gameObject;
         default_icon = achbox.transform.GetChild(0).GetChild(2).GetChild(0).GetComponent<Image>().sprite;
-        GameObject.DontDestroyOnLoad(coreGO);
+        GameObject.DontDestroyOnLoad(canvas);
         ModConsole.Log("<color=yellow>Achievement Core loaded succesfully!</color>");
         AddBaseAchievements();
-        //AddVanillaAchievements();
         AchievementHandler.TriggerAchievement("achcore_using_achcore", true);
         ab.Unload(false);
         AchievementHandler.StartSecondPass();
-        //GenerateALotOfAchievementsAndMods();
     }
     void AddVanillaAchievements()
     {

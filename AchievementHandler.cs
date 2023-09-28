@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Text;
 class AchievementHandler : MonoBehaviour
 {
-    [SerializeField] private GameObject box_prefab, filler, progress_bar;
+    [SerializeField] GameObject box_prefab, filler, progress_bar;
     public GameObject achievement_box, ui;
-    [SerializeField] private Sprite default_icon;
-    private Text header, description_text;
-    private Image Icon;
-    private Animation anim;
+    Sprite default_icon;
+    Text header, description_text;
+    Image Icon;
+    Animation anim;
     private bool playing = false;
     private List<string> queueID = new List<string>();
     public void StartSecondPass()
@@ -113,6 +113,7 @@ class AchievementHandler : MonoBehaviour
         GameObject inst = GameObject.Instantiate(box_prefab);
         inst.transform.SetParent(boxParent);
         inst.name = $"Achievement_{id}";
+        inst.transform.localScale = Vector3.one;
 
         Text textName = inst.transform.GetChild(0).GetChild(0).GetComponent<Text>();
         Text textDescription = inst.transform.GetChild(1).GetChild(0).GetComponent<Text>();
