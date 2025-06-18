@@ -10,6 +10,7 @@ class CanvasController : MonoBehaviour
     public AchievementHandler ah;
     public GameObject ui;
     public Text mod_text;
+    internal AudioClip boltscrew;
     private bool enable = false;
     public bool onLoad = false;
     string currentText = "";
@@ -17,7 +18,16 @@ class CanvasController : MonoBehaviour
 
     public void Start()
     {
-        console = FindObjectsOfType<MSCLoader.ConsoleView>()[0].transform.GetChild(0).gameObject;
+        GameObject[] g = Resources.FindObjectsOfTypeAll<GameObject>();
+        foreach (GameObject go in g)
+        {
+            if (go.name.Equals("MSCLoader Console"))
+            {
+                console = go.transform.GetChild(0).gameObject;
+                break;
+            }
+        }
+        //console = FindObjectsOfType<MSCLoader.ConsoleView>()[0].transform.GetChild(0).gameObject;
         disableUI = transform.GetChild(0).gameObject;
     }
     public void FindOptionsMenu()
@@ -53,7 +63,7 @@ class CanvasController : MonoBehaviour
         ah.GenerateAchievementList(nextAchievementKey);
         mod_text.text = nextAchievementKey.ToUpper();
         slider.value = 1f;
-        //MasterAudio.PlaySound("bolt_screw", 0.4f);
+        AudioSource.PlayClipAtPoint(boltscrew, Camera.main.transform.position, 0.4f);
     }
     public void GenerateBaseAchievementKey()
     {
@@ -66,11 +76,12 @@ class CanvasController : MonoBehaviour
     {
         ui.SetActive(!enable);
         enable = !enable;
+        AudioSource.PlayClipAtPoint(boltscrew, Camera.main.transform.position, 0.4f);
     }
     private void Update()
     {
         if (!onLoad) disableUI.SetActive(!console.activeSelf);
-        else if (onLoad && !console.activeSelf) disableUI.SetActive(options_menu.activeInHierarchy);
+        if (onLoad && !console.activeSelf) disableUI.SetActive(options_menu.activeInHierarchy);
         else if (onLoad && console.activeSelf) disableUI.SetActive(!console.activeSelf);
     }
 }

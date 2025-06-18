@@ -4,12 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Collections;
 using UnityEngine.UI;
+using HutongGames.PlayMaker;
+using HutongGames.PlayMaker.Actions;
+
 public class AchievementCore : Mod
 {
     public override string ID => "AchievementCore";
     public override string Name => "Achievement Core";
     public override string Author => "komornik";
-    public override string Version => "1.0.4";
+    public override string Version => "1.0.5";
     public override string Description => "Achievement system for all your mods!";
     public static bool DEBUG = false;
     protected private static GameObject canvas, achbox, coreGO, achievementExplorer, filler, box_prefab;
@@ -49,18 +52,14 @@ public class AchievementCore : Mod
     }
     void GenerateALotOfAchievementsAndMods()
     {
-        int mods = 30;
-        int achievements = 100;
+        int mods = 3;
+        int achievements = 3;
 
         for (int modIndex = 0; modIndex < mods; modIndex++)
         {
             string modId = $"mod_{modIndex}";
             string modName = $"Mod {modIndex}";
-            for (int achievementIndex = 0; achievementIndex < achievements; achievementIndex++)
-            {
-                //doesn't work currently
-                //Achievement newAchievement = new Achievement($"{modId}_achievement_{achievementIndex}", modName, $"Achievement {achievementIndex}", $"Description of Achievement {achievementIndex}");
-            }
+            Achievement.CreateAchievement(modId, modName, "afasfdaw", "asfawd");
         }
     }
     void PrintAllIDs()
@@ -112,12 +111,15 @@ public class AchievementCore : Mod
         achbox.name = "AchievementBoxHolder";
         AchievementHandler.ui = canvas.transform.Find("AchievementUI").gameObject;
         cc = AchievementHandler.ui.GetComponent<CanvasController>();
+        FsmState s = GameObject.Find("Interface").transform.Find("Buttons/ButtonContinue").GetComponent<PlayMakerFSM>().GetState("Action");
+        cc.boltscrew = s.GetAction<PlaySound>(0).clip.Value as AudioClip;
         cc.onLoad = false;
         filler = ab.LoadAsset<GameObject>("filler.prefab");
         AchievementHandler.achievement_box = achbox.transform.GetChild(0).gameObject;
         default_icon = achbox.transform.GetChild(0).GetChild(2).GetChild(0).GetComponent<Image>().sprite;
         GameObject.DontDestroyOnLoad(canvas);
         ModConsole.Log("<color=yellow>Achievement Core loaded succesfully!</color>");
+        
         AddBaseAchievements();
         AchievementHandler.TriggerAchievement("achcore_using_achcore", true);
         ab.Unload(false);
